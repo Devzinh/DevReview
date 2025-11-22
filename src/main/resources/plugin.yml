@@ -1,0 +1,8 @@
+name: DevReview
+version: '1.0'
+main: br.com.devplugins.DevReview
+api-version: '1.21'
+prefix: [ DReview ]
+authors: [ DevPlugins ]
+description: Sistema de staging e revisão para comandos administrativos.
+website: https://discord.gg/bdxGxCbqCj
