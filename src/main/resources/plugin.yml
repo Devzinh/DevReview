@@ -6,3 +6,8 @@ prefix: [ DReview ]
 authors: [ DevPlugins ]
 description: Sistema de staging e revisão para comandos administrativos.
 website: https://discord.gg/bdxGxCbqCj
+commands:
+  review:
+    description: Opens the review menu for staged commands.
+    usage: /review
+    permission: devreview.admin
