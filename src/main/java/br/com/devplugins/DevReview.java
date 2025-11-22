@@ -10,6 +10,9 @@ public final class DevReview extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        int pluginId = 28104;
+        new org.bstats.bukkit.Metrics(this, pluginId);
+
         saveDefaultConfig();
 
         this.languageManager = new br.com.devplugins.lang.LanguageManager(this);
