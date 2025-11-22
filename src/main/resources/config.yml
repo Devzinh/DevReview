@@ -1,0 +1,16 @@
+# DevReview Configuration
+
+# List of commands that require review
+critical-commands:
+  - "/op"
+  - "/deop"
+  - "/stop"
+  - "/reload"
+  - "/restart"
+  - "/ban"
+  - "/kick"
+
+# Messages
+messages:
+  command-staged: "§e[DevReview] Command staged for review: %command%"
+  bypass-notification: "§c[DevReview] Bypassed review for: %command%"

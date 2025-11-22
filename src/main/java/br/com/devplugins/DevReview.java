@@ -9,9 +9,11 @@ public final class DevReview extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        saveDefaultConfig();
         this.stagingManager = new StagingManager(this);
 
-        getServer().getPluginManager().registerEvents(new br.com.devplugins.listener.CommandInterceptor(stagingManager),
+        getServer().getPluginManager().registerEvents(
+                new br.com.devplugins.listener.CommandInterceptor(stagingManager, this),
                 this);
         getServer().getPluginManager().registerEvents(new br.com.devplugins.listener.GuiListener(stagingManager), this);
 

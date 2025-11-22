@@ -45,13 +45,20 @@ public class StagingManager {
 
         Player sender = Bukkit.getPlayer(command.getSenderId());
         if (sender != null && sender.isOnline()) {
-            sender.chat(command.getCommandLine());
+            // Use dispatchCommand to avoid triggering PlayerCommandPreprocessEvent again
+            // (loop prevention)
+            // We need to remove the leading '/' for dispatchCommand
+            String cmdToRun = command.getCommandLine();
+            if (cmdToRun.startsWith("/")) {
+                cmdToRun = cmdToRun.substring(1);
+            }
+            Bukkit.dispatchCommand(sender, cmdToRun);
             plugin.getLogger().info(
                     "Executed staged command for online player " + sender.getName() + ": " + command.getCommandLine());
         } else {
             plugin.getLogger().warning("Executing staged command for OFFLINE player " + command.getSenderName() + ": "
                     + command.getCommandLine());
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.getCommandLine().substring(1));
+
             String cmdToRun = command.getCommandLine();
             if (cmdToRun.startsWith("/")) {
                 cmdToRun = cmdToRun.substring(1);
