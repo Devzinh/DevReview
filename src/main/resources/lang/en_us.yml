@@ -1,0 +1,23 @@
+messages:
+  command-staged: "&e[DevReview] Command staged for review: %command%"
+  bypass-notification: "&c[DevReview] Bypassed review for: %command%"
+  staging-notification: "&c[Staging] &eNew command staged by %player%: &7%command%"
+  only-players: "&cOnly players can use this command."
+  command-approved: "&aCommand approved."
+  command-rejected: "&cCommand rejected."
+gui:
+  review-title: "Pending Reviews"
+  detail-title: "Review Command"
+  items:
+    click-to-review: "&aClick to review"
+    approve-name: "&a&lAPPROVE"
+    approve-lore: "&7Execute this command"
+    reject-name: "&c&lREJECT"
+    reject-lore: "&7Discard this command"
+    info-name: "&eCommand Details"
+    info-player: "&7Player: &f%player%"
+    info-command: "&7Command: &f%command%"
+    info-time: "&7Time: &f%time%"
+    list-command: "&7Command: &f%command%"
+    list-time: "&7Time: &f%time%"
+    list-id: "&7ID: &8%id%"

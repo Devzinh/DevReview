@@ -1,0 +1,23 @@
+messages:
+  command-staged: "&e[DevReview] Comando enviado para revisión: %command%"
+  bypass-notification: "&c[DevReview] Revisión omitida para: %command%"
+  staging-notification: "&c[Staging] &eNuevo comando de %player%: &7%command%"
+  only-players: "&cSolo los jugadores pueden usar este comando."
+  command-approved: "&aComando aprobado."
+  command-rejected: "&cComando rechazado."
+gui:
+  review-title: "Revisiones Pendientes"
+  detail-title: "Revisar Comando"
+  items:
+    click-to-review: "&aClic para revisar"
+    approve-name: "&a&lAPROBAR"
+    approve-lore: "&7Ejecutar este comando"
+    reject-name: "&c&lRECHAZAR"
+    reject-lore: "&7Descartar este comando"
+    info-name: "&eDetalles del Comando"
+    info-player: "&7Jugador: &f%player%"
+    info-command: "&7Comando: &f%command%"
+    info-time: "&7Hora: &f%time%"
+    list-command: "&7Comando: &f%command%"
+    list-time: "&7Hora: &f%time%"
+    list-id: "&7ID: &8%id%"

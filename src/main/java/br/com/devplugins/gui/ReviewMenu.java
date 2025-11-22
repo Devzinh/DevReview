@@ -20,10 +20,15 @@ public class ReviewMenu implements InventoryHolder {
 
     private final StagingManager stagingManager;
     private final Inventory inventory;
+    private final br.com.devplugins.lang.LanguageManager languageManager;
+    private final Player viewer;
 
-    public ReviewMenu(StagingManager stagingManager) {
+    public ReviewMenu(StagingManager stagingManager, br.com.devplugins.lang.LanguageManager languageManager,
+            Player viewer) {
         this.stagingManager = stagingManager;
-        this.inventory = Bukkit.createInventory(this, 54, "Pending Reviews");
+        this.languageManager = languageManager;
+        this.viewer = viewer;
+        this.inventory = Bukkit.createInventory(this, 54, languageManager.getMessage(viewer, "gui.review-title"));
         loadItems();
     }
 
@@ -41,12 +46,21 @@ public class ReviewMenu implements InventoryHolder {
             ItemMeta meta = item.getItemMeta();
             if (meta != null) {
                 meta.setDisplayName(ChatColor.YELLOW + cmd.getSenderName());
+
+                String listCommand = languageManager.getMessage(viewer, "gui.items.list-command").replace("%command%",
+                        cmd.getCommandLine());
+                String listTime = languageManager.getMessage(viewer, "gui.items.list-time").replace("%time%",
+                        sdf.format(new Date(cmd.getTimestamp())));
+                String listId = languageManager.getMessage(viewer, "gui.items.list-id").replace("%id%",
+                        cmd.getId().toString());
+                String clickReview = languageManager.getMessage(viewer, "gui.items.click-to-review");
+
                 meta.setLore(Arrays.asList(
-                        ChatColor.GRAY + "Command: " + ChatColor.WHITE + cmd.getCommandLine(),
-                        ChatColor.GRAY + "Time: " + ChatColor.WHITE + sdf.format(new Date(cmd.getTimestamp())),
-                        ChatColor.GRAY + "ID: " + ChatColor.DARK_GRAY + cmd.getId(),
+                        listCommand,
+                        listTime,
+                        listId,
                         "",
-                        ChatColor.GREEN + "Click to review"));
+                        clickReview));
                 item.setItemMeta(meta);
             }
             inventory.setItem(slot++, item);

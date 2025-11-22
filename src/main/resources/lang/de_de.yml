@@ -1,0 +1,23 @@
+messages:
+  command-staged: "&e[DevReview] Befehl zur Überprüfung vorgemerkt: %command%"
+  bypass-notification: "&c[DevReview] Überprüfung umgangen für: %command%"
+  staging-notification: "&c[Staging] &eNeuer Befehl von %player%: &7%command%"
+  only-players: "&cNur Spieler können diesen Befehl verwenden."
+  command-approved: "&aBefehl genehmigt."
+  command-rejected: "&cBefehl abgelehnt."
+gui:
+  review-title: "Ausstehende Überprüfungen"
+  detail-title: "Befehl überprüfen"
+  items:
+    click-to-review: "&aKlicken zum Überprüfen"
+    approve-name: "&a&lGENEHMIGEN"
+    approve-lore: "&7Diesen Befehl ausführen"
+    reject-name: "&c&lABLEHNEN"
+    reject-lore: "&7Diesen Befehl verwerfen"
+    info-name: "&eBefehlsdetails"
+    info-player: "&7Spieler: &f%player%"
+    info-command: "&7Befehl: &f%command%"
+    info-time: "&7Zeit: &f%time%"
+    list-command: "&7Befehl: &f%command%"
+    list-time: "&7Zeit: &f%time%"
+    list-id: "&7ID: &8%id%"

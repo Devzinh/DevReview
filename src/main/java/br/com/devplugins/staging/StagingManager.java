@@ -19,9 +19,11 @@ public class StagingManager {
     private final List<StagedCommand> pendingCommands;
     private final File storageFile;
     private final Gson gson;
+    private final br.com.devplugins.lang.LanguageManager languageManager;
 
-    public StagingManager(JavaPlugin plugin) {
+    public StagingManager(JavaPlugin plugin, br.com.devplugins.lang.LanguageManager languageManager) {
         this.plugin = plugin;
+        this.languageManager = languageManager;
         this.pendingCommands = new ArrayList<>();
         this.storageFile = new File(plugin.getDataFolder(), "staged_commands.json");
         this.gson = new GsonBuilder().setPrettyPrinting().create();
@@ -32,11 +34,16 @@ public class StagingManager {
         StagedCommand command = new StagedCommand(sender.getUniqueId(), sender.getName(), commandLine);
         pendingCommands.add(command);
         saveCommands();
-        sender.sendMessage("§eCommand staged for review: " + commandLine);
+
+        String msg = languageManager.getMessage(sender, "messages.command-staged");
+        sender.sendMessage(msg.replace("%command%", commandLine));
+
         Bukkit.getOnlinePlayers().stream()
                 .filter(p -> p.hasPermission("devreview.admin"))
-                .forEach(p -> p
-                        .sendMessage("§c[Staging] §eNew command staged by " + sender.getName() + ": §7" + commandLine));
+                .forEach(p -> {
+                    String notify = languageManager.getMessage(p, "messages.staging-notification");
+                    p.sendMessage(notify.replace("%player%", sender.getName()).replace("%command%", commandLine));
+                });
     }
 
     public void approveCommand(StagedCommand command) {
@@ -45,9 +52,6 @@ public class StagingManager {
 
         Player sender = Bukkit.getPlayer(command.getSenderId());
         if (sender != null && sender.isOnline()) {
-            // Use dispatchCommand to avoid triggering PlayerCommandPreprocessEvent again
-            // (loop prevention)
-            // We need to remove the leading '/' for dispatchCommand
             String cmdToRun = command.getCommandLine();
             if (cmdToRun.startsWith("/")) {
                 cmdToRun = cmdToRun.substring(1);

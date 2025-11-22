@@ -3,7 +3,7 @@ package br.com.devplugins.gui;
 import br.com.devplugins.staging.StagedCommand;
 import br.com.devplugins.staging.StagingManager;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -19,42 +19,58 @@ public class CommandDetailMenu implements InventoryHolder {
 
     private final StagedCommand command;
     private final Inventory inventory;
+    private final br.com.devplugins.lang.LanguageManager languageManager;
+    private final Player viewer;
 
-    public CommandDetailMenu(StagingManager stagingManager, StagedCommand command) {
+    public CommandDetailMenu(StagingManager stagingManager, StagedCommand command,
+            br.com.devplugins.lang.LanguageManager languageManager, Player viewer) {
         this.command = command;
-        this.inventory = Bukkit.createInventory(this, 27, "Review Command");
+        this.languageManager = languageManager;
+        this.viewer = viewer;
+        this.inventory = Bukkit.createInventory(this, 27, languageManager.getMessage(viewer, "gui.detail-title"));
         loadItems();
     }
 
     private void loadItems() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
+        // Info Item
         ItemStack info = new ItemStack(Material.BOOK);
         ItemMeta infoMeta = info.getItemMeta();
         if (infoMeta != null) {
-            infoMeta.setDisplayName(ChatColor.YELLOW + "Command Details");
+            infoMeta.setDisplayName(languageManager.getMessage(viewer, "gui.items.info-name"));
+
+            String infoPlayer = languageManager.getMessage(viewer, "gui.items.info-player").replace("%player%",
+                    command.getSenderName());
+            String infoCommand = languageManager.getMessage(viewer, "gui.items.info-command").replace("%command%",
+                    command.getCommandLine());
+            String infoTime = languageManager.getMessage(viewer, "gui.items.info-time").replace("%time%",
+                    sdf.format(new Date(command.getTimestamp())));
+
             infoMeta.setLore(Arrays.asList(
-                    ChatColor.GRAY + "Player: " + ChatColor.WHITE + command.getSenderName(),
-                    ChatColor.GRAY + "Command: " + ChatColor.WHITE + command.getCommandLine(),
-                    ChatColor.GRAY + "Time: " + ChatColor.WHITE + sdf.format(new Date(command.getTimestamp()))));
+                    infoPlayer,
+                    infoCommand,
+                    infoTime));
             info.setItemMeta(infoMeta);
         }
         inventory.setItem(13, info);
 
+        // Confirm Item
         ItemStack confirm = new ItemStack(Material.LIME_WOOL);
         ItemMeta confirmMeta = confirm.getItemMeta();
         if (confirmMeta != null) {
-            confirmMeta.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD + "APPROVE");
-            confirmMeta.setLore(Arrays.asList(ChatColor.GRAY + "Execute this command"));
+            confirmMeta.setDisplayName(languageManager.getMessage(viewer, "gui.items.approve-name"));
+            confirmMeta.setLore(Arrays.asList(languageManager.getMessage(viewer, "gui.items.approve-lore")));
             confirm.setItemMeta(confirmMeta);
         }
         inventory.setItem(11, confirm);
 
+        // Deny Item
         ItemStack deny = new ItemStack(Material.RED_WOOL);
         ItemMeta denyMeta = deny.getItemMeta();
         if (denyMeta != null) {
-            denyMeta.setDisplayName(ChatColor.RED + "" + ChatColor.BOLD + "REJECT");
-            denyMeta.setLore(Arrays.asList(ChatColor.GRAY + "Discard this command"));
+            denyMeta.setDisplayName(languageManager.getMessage(viewer, "gui.items.reject-name"));
+            denyMeta.setLore(Arrays.asList(languageManager.getMessage(viewer, "gui.items.reject-lore")));
             deny.setItemMeta(denyMeta);
         }
         inventory.setItem(15, deny);

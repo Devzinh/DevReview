@@ -1,0 +1,23 @@
+messages:
+  command-staged: "&e[DevReview] Команда отправлена на проверку: %command%"
+  bypass-notification: "&c[DevReview] Проверка пропущена для: %command%"
+  staging-notification: "&c[Staging] &eНовая команда от %player%: &7%command%"
+  only-players: "&cТолько игроки могут использовать эту команду."
+  command-approved: "&aКоманда одобрена."
+  command-rejected: "&cКоманда отклонена."
+gui:
+  review-title: "Ожидающие проверки"
+  detail-title: "Проверка команды"
+  items:
+    click-to-review: "&aНажмите для проверки"
+    approve-name: "&a&lОДОБРИТЬ"
+    approve-lore: "&7Выполнить эту команду"
+    reject-name: "&c&lОТКЛОНИТЬ"
+    reject-lore: "&7Отменить эту команду"
+    info-name: "&eДетали команды"
+    info-player: "&7Игрок: &f%player%"
+    info-command: "&7Команда: &f%command%"
+    info-time: "&7Время: &f%time%"
+    list-command: "&7Команда: &f%command%"
+    list-time: "&7Время: &f%time%"
+    list-id: "&7ID: &8%id%"

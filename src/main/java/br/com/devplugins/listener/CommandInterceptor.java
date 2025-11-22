@@ -12,10 +12,13 @@ public class CommandInterceptor implements Listener {
 
     private final StagingManager stagingManager;
     private final org.bukkit.plugin.java.JavaPlugin plugin;
+    private final br.com.devplugins.lang.LanguageManager languageManager;
 
-    public CommandInterceptor(StagingManager stagingManager, org.bukkit.plugin.java.JavaPlugin plugin) {
+    public CommandInterceptor(StagingManager stagingManager, org.bukkit.plugin.java.JavaPlugin plugin,
+            br.com.devplugins.lang.LanguageManager languageManager) {
         this.stagingManager = stagingManager;
         this.plugin = plugin;
+        this.languageManager = languageManager;
     }
 
     @EventHandler
@@ -25,20 +28,20 @@ public class CommandInterceptor implements Listener {
 
         List<String> criticalCommands = plugin.getConfig().getStringList("critical-commands");
         if (criticalCommands.isEmpty()) {
-            // Fallback if config is broken or empty
             criticalCommands = Arrays.asList("/op", "/stop", "/reload", "/restart", "/ban", "/deop");
         }
 
         if (criticalCommands.contains(command)) {
             if (event.getPlayer().hasPermission("devreview.bypass")) {
+                String msg = languageManager.getMessage(event.getPlayer(), "messages.bypass-notification");
+                event.getPlayer().sendMessage(msg.replace("%command%", message));
                 return;
             }
 
             event.setCancelled(true);
             stagingManager.stageCommand(event.getPlayer(), message);
 
-            String msg = plugin.getConfig().getString("messages.command-staged",
-                    "§eCommand staged for review: %command%");
+            String msg = languageManager.getMessage(event.getPlayer(), "messages.command-staged");
             event.getPlayer().sendMessage(msg.replace("%command%", message));
         }
     }

@@ -1,0 +1,23 @@
+messages:
+  command-staged: "&e[DevReview] Polecenie oczekuje na przegląd: %command%"
+  bypass-notification: "&c[DevReview] Pominięto przegląd dla: %command%"
+  staging-notification: "&c[Staging] &eNowe polecenie od %player%: &7%command%"
+  only-players: "&cTylko gracze mogą używać tego polecenia."
+  command-approved: "&aPolecenie zatwierdzone."
+  command-rejected: "&cPolecenie odrzucone."
+gui:
+  review-title: "Oczekujące przeglądy"
+  detail-title: "Przegląd polecenia"
+  items:
+    click-to-review: "&aKliknij, aby przejrzeć"
+    approve-name: "&a&lZATWIERDŹ"
+    approve-lore: "&7Wykonaj to polecenie"
+    reject-name: "&c&lODRZUĆ"
+    reject-lore: "&7Odrzuć to polecenie"
+    info-name: "&eSzczegóły polecenia"
+    info-player: "&7Gracz: &f%player%"
+    info-command: "&7Polecenie: &f%command%"
+    info-time: "&7Czas: &f%time%"
+    list-command: "&7Polecenie: &f%command%"
+    list-time: "&7Czas: &f%time%"
+    list-id: "&7ID: &8%id%"

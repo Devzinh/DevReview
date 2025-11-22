@@ -1,0 +1,23 @@
+messages:
+  command-staged: "&e[DevReview] Commande mise en attente pour examen : %command%"
+  bypass-notification: "&c[DevReview] Examen contourné pour : %command%"
+  staging-notification: "&c[Staging] &eNouvelle commande de %player% : &7%command%"
+  only-players: "&cSeuls les joueurs peuvent utiliser cette commande."
+  command-approved: "&aCommande approuvée."
+  command-rejected: "&cCommande rejetée."
+gui:
+  review-title: "Examens en attente"
+  detail-title: "Examiner la commande"
+  items:
+    click-to-review: "&aCliquez pour examiner"
+    approve-name: "&a&lAPPROUVER"
+    approve-lore: "&7Exécuter cette commande"
+    reject-name: "&c&lREJETER"
+    reject-lore: "&7Rejeter cette commande"
+    info-name: "&eDétails de la commande"
+    info-player: "&7Joueur : &f%player%"
+    info-command: "&7Commande : &f%command%"
+    info-time: "&7Heure : &f%time%"
+    list-command: "&7Commande : &f%command%"
+    list-time: "&7Heure : &f%time%"
+    list-id: "&7ID : &8%id%"

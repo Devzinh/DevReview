@@ -19,9 +19,11 @@ import java.util.UUID;
 public class GuiListener implements Listener {
 
     private final StagingManager stagingManager;
+    private final br.com.devplugins.lang.LanguageManager languageManager;
 
-    public GuiListener(StagingManager stagingManager) {
+    public GuiListener(StagingManager stagingManager, br.com.devplugins.lang.LanguageManager languageManager) {
         this.stagingManager = stagingManager;
+        this.languageManager = languageManager;
     }
 
     @EventHandler
@@ -49,11 +51,14 @@ public class GuiListener implements Listener {
             return;
 
         String idString = null;
-        for (String line : lore) {
+
+        if (lore.size() > 2) {
+            String line = lore.get(2);
+
             String text = ChatColor.stripColor(line);
-            if (text.startsWith("ID: ")) {
-                idString = text.substring(4).trim();
-                break;
+            int lastSpace = text.lastIndexOf(" ");
+            if (lastSpace != -1) {
+                idString = text.substring(lastSpace + 1).trim();
             }
         }
 
@@ -66,7 +71,8 @@ public class GuiListener implements Listener {
                         .orElse(null);
 
                 if (target != null) {
-                    new CommandDetailMenu(stagingManager, target).open((Player) event.getWhoClicked());
+                    new CommandDetailMenu(stagingManager, target, languageManager, (Player) event.getWhoClicked())
+                            .open((Player) event.getWhoClicked());
                 }
             } catch (IllegalArgumentException ignored) {
             }
@@ -83,14 +89,14 @@ public class GuiListener implements Listener {
 
         if (item.getType() == Material.LIME_WOOL) {
             stagingManager.approveCommand(command);
-            player.sendMessage(ChatColor.GREEN + "Command approved.");
+            player.sendMessage(languageManager.getMessage(player, "messages.command-approved"));
             player.closeInventory();
-            new ReviewMenu(stagingManager).open(player);
+            new ReviewMenu(stagingManager, languageManager, player).open(player);
         } else if (item.getType() == Material.RED_WOOL) {
             stagingManager.rejectCommand(command);
-            player.sendMessage(ChatColor.RED + "Command rejected.");
+            player.sendMessage(languageManager.getMessage(player, "messages.command-rejected"));
             player.closeInventory();
-            new ReviewMenu(stagingManager).open(player);
+            new ReviewMenu(stagingManager, languageManager, player).open(player);
         }
     }
 }
