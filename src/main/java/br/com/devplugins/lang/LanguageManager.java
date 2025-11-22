@@ -43,6 +43,19 @@ public class LanguageManager {
 
     public String getMessage(String locale, String key) {
         FileConfiguration config = languages.get(locale);
+
+        if (config == null) {
+            if (locale.length() > 2) {
+                String langCode = locale.substring(0, 2);
+                for (String supported : supportedLocales) {
+                    if (supported.startsWith(langCode)) {
+                        config = languages.get(supported);
+                        break;
+                    }
+                }
+            }
+        }
+
         if (config == null) {
             config = languages.get("en_us");
         }
