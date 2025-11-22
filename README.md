@@ -44,8 +44,8 @@ messages:
 | Command | Permission | Description |
 |---|---|---|
 | `/review` | `devreview.admin` | Opens the review GUI to manage pending commands. |
-| N/A | `staffreview.bypass` | Allows a player to bypass the staging system and execute commands immediately. |
-| N/A | `devplugins.staging.admin` | Receives notifications when a new command is staged. |
+| N/A | `devreview.bypass` | Allows a player to bypass the staging system and execute commands immediately. |
+| N/A | `devreview.admin` | Receives notifications when a new command is staged. |
 
 ## Usage Guide
 1. **Staging**: When a player without bypass permission types a critical command (e.g., `/op TestUser`), the command is blocked.

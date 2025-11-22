@@ -30,7 +30,7 @@ public class CommandInterceptor implements Listener {
         }
 
         if (criticalCommands.contains(command)) {
-            if (event.getPlayer().hasPermission("staffreview.bypass")) {
+            if (event.getPlayer().hasPermission("devreview.bypass")) {
                 return;
             }
 

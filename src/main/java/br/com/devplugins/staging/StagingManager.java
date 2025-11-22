@@ -34,7 +34,7 @@ public class StagingManager {
         saveCommands();
         sender.sendMessage("§eCommand staged for review: " + commandLine);
         Bukkit.getOnlinePlayers().stream()
-                .filter(p -> p.hasPermission("devplugins.staging.admin"))
+                .filter(p -> p.hasPermission("devreview.admin"))
                 .forEach(p -> p
                         .sendMessage("§c[Staging] §eNew command staged by " + sender.getName() + ": §7" + commandLine));
     }
