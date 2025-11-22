@@ -41,8 +41,6 @@ public class CommandInterceptor implements Listener {
             event.setCancelled(true);
             stagingManager.stageCommand(event.getPlayer(), message);
 
-            String msg = languageManager.getMessage(event.getPlayer(), "messages.command-staged");
-            event.getPlayer().sendMessage(msg.replace("%command%", message));
         }
     }
 }
