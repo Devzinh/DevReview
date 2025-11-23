@@ -1,0 +1,9 @@
+enabled: true
+log-to-file: true
+log-to-console: true
+file-name: "audit.log"
+events:
+  stage: true
+  approve: true
+  reject: true
+  bypass: true

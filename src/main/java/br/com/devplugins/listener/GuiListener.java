@@ -4,26 +4,35 @@ import br.com.devplugins.gui.CommandDetailMenu;
 import br.com.devplugins.gui.ReviewMenu;
 import br.com.devplugins.staging.StagedCommand;
 import br.com.devplugins.staging.StagingManager;
-import org.bukkit.ChatColor;
+import br.com.devplugins.utils.CategoryManager;
+
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 public class GuiListener implements Listener {
 
     private final StagingManager stagingManager;
     private final br.com.devplugins.lang.LanguageManager languageManager;
+    private final CategoryManager categoryManager;
+    private final Map<UUID, Consumer<String>> awaitingJustification = new ConcurrentHashMap<>();
 
-    public GuiListener(StagingManager stagingManager, br.com.devplugins.lang.LanguageManager languageManager) {
+    public GuiListener(StagingManager stagingManager, br.com.devplugins.lang.LanguageManager languageManager,
+            CategoryManager categoryManager) {
         this.stagingManager = stagingManager;
         this.languageManager = languageManager;
+        this.categoryManager = categoryManager;
     }
 
     @EventHandler
@@ -41,6 +50,21 @@ public class GuiListener implements Listener {
         }
     }
 
+    @EventHandler
+    public void onChat(AsyncPlayerChatEvent event) {
+        Player player = event.getPlayer();
+        if (awaitingJustification.containsKey(player.getUniqueId())) {
+            event.setCancelled(true);
+            Consumer<String> action = awaitingJustification.remove(player.getUniqueId());
+
+            // Run on main thread because we might call Bukkit API
+            org.bukkit.Bukkit.getScheduler().runTask(org.bukkit.plugin.java.JavaPlugin.getProvidingPlugin(getClass()),
+                    () -> {
+                        action.accept(event.getMessage());
+                    });
+        }
+    }
+
     private void handleReviewMenuClick(InventoryClickEvent event, ReviewMenu menu) {
         ItemStack item = event.getCurrentItem();
         if (item == null || item.getType() == Material.AIR)
@@ -52,14 +76,13 @@ public class GuiListener implements Listener {
 
         String idString = null;
 
-        if (lore.size() > 2) {
-            String line = lore.get(2);
+        // Read ID from PersistentDataContainer
+        org.bukkit.persistence.PersistentDataContainer data = item.getItemMeta().getPersistentDataContainer();
+        org.bukkit.NamespacedKey key = new org.bukkit.NamespacedKey(
+                org.bukkit.plugin.java.JavaPlugin.getProvidingPlugin(getClass()), "command_id");
 
-            String text = ChatColor.stripColor(line);
-            int lastSpace = text.lastIndexOf(" ");
-            if (lastSpace != -1) {
-                idString = text.substring(lastSpace + 1).trim();
-            }
+        if (data.has(key, org.bukkit.persistence.PersistentDataType.STRING)) {
+            idString = data.get(key, org.bukkit.persistence.PersistentDataType.STRING);
         }
 
         if (idString != null) {
@@ -71,7 +94,8 @@ public class GuiListener implements Listener {
                         .orElse(null);
 
                 if (target != null) {
-                    new CommandDetailMenu(stagingManager, target, languageManager, (Player) event.getWhoClicked())
+                    new CommandDetailMenu(stagingManager, target, languageManager, (Player) event.getWhoClicked(),
+                            categoryManager)
                             .open((Player) event.getWhoClicked());
                 }
             } catch (IllegalArgumentException ignored) {
@@ -88,15 +112,24 @@ public class GuiListener implements Listener {
         StagedCommand command = menu.getCommand();
 
         if (item.getType() == Material.LIME_WOOL) {
-            stagingManager.approveCommand(command);
-            player.sendMessage(languageManager.getMessage(player, "messages.command-approved"));
             player.closeInventory();
-            new ReviewMenu(stagingManager, languageManager, player).open(player);
+            player.sendMessage(languageManager.getMessage(player, "messages.enter-justification-approve"));
+            awaitingJustification.put(player.getUniqueId(), (justification) -> {
+                command.setJustification(justification);
+                stagingManager.approveCommand(command);
+                player.sendMessage(languageManager.getMessage(player, "messages.command-approved"));
+                new ReviewMenu(stagingManager, languageManager, player, categoryManager).open(player);
+            });
+
         } else if (item.getType() == Material.RED_WOOL) {
-            stagingManager.rejectCommand(command);
-            player.sendMessage(languageManager.getMessage(player, "messages.command-rejected"));
             player.closeInventory();
-            new ReviewMenu(stagingManager, languageManager, player).open(player);
+            player.sendMessage(languageManager.getMessage(player, "messages.enter-justification-reject"));
+            awaitingJustification.put(player.getUniqueId(), (justification) -> {
+                command.setJustification(justification);
+                stagingManager.rejectCommand(command);
+                player.sendMessage(languageManager.getMessage(player, "messages.command-rejected"));
+                new ReviewMenu(stagingManager, languageManager, player, categoryManager).open(player);
+            });
         }
     }
 }

@@ -9,8 +9,3 @@ critical-commands:
   - "/restart"
   - "/ban"
   - "/kick"
-
-# Messages
-messages:
-  command-staged: "§e[DevReview] Command staged for review: %command%"
-  bypass-notification: "§c[DevReview] Bypassed review for: %command%"

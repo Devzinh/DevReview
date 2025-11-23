@@ -36,6 +36,13 @@ public class LanguageManager {
         }
     }
 
+    public String getMessage(org.bukkit.command.CommandSender sender, String key) {
+        if (sender instanceof Player) {
+            return getMessage((Player) sender, key);
+        }
+        return getMessage("en_us", key);
+    }
+
     public String getMessage(Player player, String key) {
         String locale = player.getLocale().toLowerCase();
         return getMessage(locale, key);

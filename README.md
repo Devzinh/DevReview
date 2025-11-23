@@ -3,25 +3,6 @@
 
 ## Overview
 DevReview is a robust security plugin designed to intercept critical administrative commands (such as `/op`, `/ban`, `/stop`) and place them in a staging area. Authorized staff must review and approve these commands via an interactive GUI before they are executed. This system prevents accidental misuse or malicious abuse of administrative powers, ensuring a safer server environment.
-
-## Features
-- **🛡️ Command Interception**: Automatically blocks and stages configured commands.
-- **🖥️ Interactive GUI**: Easy-to-use menu (`/review`) to approve or reject commands.
-- **💾 Persistence**: Staged commands are saved locally and survive server restarts.
-- **⚡ Smart Execution**:
-  - **Online**: Forces the original sender to chat the command (preserving permissions and context).
-  - **Offline**: Executes via console with strict author attribution logging.
-- **⚙️ Fully Configurable**: Customize critical commands and messages via `config.yml`.
-- **🔓 Bypass System**: Granular permission to allow trusted admins to bypass the review process.
-
-## Installation
-1. Download the `DevReview.jar` file.
-2. Place it in your server's `plugins` folder.
-3. Restart the server to generate the configuration file.
-4. Edit `plugins/DevReview/config.yml` to add/remove critical commands.
-
-## Configuration
-Default `config.yml`:
 ```yaml
 # List of commands that require review
 critical-commands:

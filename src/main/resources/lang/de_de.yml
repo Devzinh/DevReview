@@ -1,10 +1,15 @@
 messages:
   command-staged: "&e[DevReview] Befehl zur Überprüfung vorgemerkt: %command%"
-  bypass-notification: "&c[DevReview] Überprüfung umgangen für: %command%"
+  bypass-player-notification: "&ePrüfung umgangen für: %command%"
+  bypass-admin-notification: "&c[DevReview] %player% hat die Prüfung umgangen für: %command%"
   staging-notification: "&c[Staging] &eNeuer Befehl von %player%: &7%command%"
   only-players: "&cNur Spieler können diesen Befehl verwenden."
   command-approved: "&aBefehl genehmigt."
   command-rejected: "&cBefehl abgelehnt."
+  approval-notification: "&a[DevReview] Befehl von %player% genehmigt: %command%"
+  rejection-notification: "&c[DevReview] Befehl von %player% abgelehnt: %command%"
+  enter-justification-approve: "&eBitte geben Sie eine Begründung für die GENEHMIGUNG im Chat ein:"
+  enter-justification-reject: "&eBitte geben Sie eine Begründung für die ABLEHNUNG im Chat ein:"
 gui:
   review-title: "Ausstehende Überprüfungen"
   detail-title: "Befehl überprüfen"

@@ -1,0 +1,10 @@
+auto-approve:
+  enabled: false
+  start-time: "00:00"
+  end-time: "06:00"
+
+expiration:
+  enabled: true
+  duration-minutes: 1440 # 24 hours
+
+

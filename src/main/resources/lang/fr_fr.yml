@@ -1,10 +1,15 @@
 messages:
   command-staged: "&e[DevReview] Commande mise en attente pour examen : %command%"
-  bypass-notification: "&c[DevReview] Examen contourné pour : %command%"
+  bypass-player-notification: "&eExamen contourné pour : %command%"
+  bypass-admin-notification: "&c[DevReview] %player% a contourné l'examen pour : %command%"
   staging-notification: "&c[Staging] &eNouvelle commande de %player% : &7%command%"
   only-players: "&cSeuls les joueurs peuvent utiliser cette commande."
   command-approved: "&aCommande approuvée."
   command-rejected: "&cCommande rejetée."
+  approval-notification: "&a[DevReview] Commande de %player% approuvée : %command%"
+  rejection-notification: "&c[DevReview] Commande de %player% rejetée : %command%"
+  enter-justification-approve: "&eVeuillez saisir une justification pour l'APPROBATION dans le chat :"
+  enter-justification-reject: "&eVeuillez saisir une justification pour le REJET dans le chat :"
 gui:
   review-title: "Examens en attente"
   detail-title: "Examiner la commande"

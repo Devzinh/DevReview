@@ -1,10 +1,15 @@
 messages:
   command-staged: "&e[DevReview] Command staged for review: %command%"
-  bypass-notification: "&c[DevReview] Bypassed review for: %command%"
+  bypass-player-notification: "&eBypassed review for: %command%"
+  bypass-admin-notification: "&c[DevReview] %player% bypassed review for: %command%"
   staging-notification: "&c[Staging] &eNew command staged by %player%: &7%command%"
   only-players: "&cOnly players can use this command."
   command-approved: "&aCommand approved."
   command-rejected: "&cCommand rejected."
+  approval-notification: "&a[DevReview] Command from %player% approved: %command%"
+  rejection-notification: "&c[DevReview] Command from %player% rejected: %command%"
+  enter-justification-approve: "&ePlease enter a justification for APPROVAL in chat:"
+  enter-justification-reject: "&ePlease enter a justification for REJECTION in chat:"
 gui:
   review-title: "Pending Reviews"
   detail-title: "Review Command"

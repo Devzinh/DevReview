@@ -1,113 +1,161 @@
 package br.com.devplugins.staging;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
+import br.com.devplugins.audit.AuditManager;
+import br.com.devplugins.notifications.NotificationManager;
+import br.com.devplugins.rules.RulesEngine;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.*;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
+import java.util.UUID;
 
 public class StagingManager {
 
     private final JavaPlugin plugin;
-    private final List<StagedCommand> pendingCommands;
-    private final File storageFile;
-    private final Gson gson;
+    private final StagedCommandRepository repository;
     private final br.com.devplugins.lang.LanguageManager languageManager;
+    private final AuditManager auditManager;
+    private final NotificationManager notificationManager;
+    private final RulesEngine rulesEngine;
+    private final List<StagedCommand> pendingCommands;
 
-    public StagingManager(JavaPlugin plugin, br.com.devplugins.lang.LanguageManager languageManager) {
+    public StagingManager(JavaPlugin plugin,
+            StagedCommandRepository repository,
+            br.com.devplugins.lang.LanguageManager languageManager,
+            AuditManager auditManager,
+            NotificationManager notificationManager,
+            RulesEngine rulesEngine) {
         this.plugin = plugin;
+        this.repository = repository;
         this.languageManager = languageManager;
+        this.auditManager = auditManager;
+        this.notificationManager = notificationManager;
+        this.rulesEngine = rulesEngine;
         this.pendingCommands = new ArrayList<>();
-        this.storageFile = new File(plugin.getDataFolder(), "staged_commands.json");
-        this.gson = new GsonBuilder().setPrettyPrinting().create();
         loadCommands();
     }
 
-    public void stageCommand(Player sender, String commandLine) {
-        StagedCommand command = new StagedCommand(sender.getUniqueId(), sender.getName(), commandLine);
+    public void stageCommand(CommandSender sender, String commandLine) {
+        UUID senderId;
+        String senderName;
+
+        if (sender instanceof Player) {
+            senderId = ((Player) sender).getUniqueId();
+            senderName = sender.getName();
+        } else {
+            senderId = UUID.nameUUIDFromBytes("CONSOLE".getBytes());
+            senderName = "CONSOLE";
+        }
+
+        StagedCommand command = new StagedCommand(senderId, senderName, commandLine);
+
+        // Check auto-approve rule
+        if (rulesEngine.shouldAutoApprove()) {
+            executeCommand(command);
+            auditManager.log("approve", "Auto-Approve", "Command auto-approved by rules: " + commandLine);
+            notificationManager.notifyApproval(command);
+            return;
+        }
+
         pendingCommands.add(command);
-        saveCommands();
 
-        String msg = languageManager.getMessage(sender, "messages.command-staged");
-        sender.sendMessage(msg.replace("%command%", commandLine));
+        // Async save
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            repository.save(command);
+        });
 
-        Bukkit.getOnlinePlayers().stream()
-                .filter(p -> p.hasPermission("devreview.admin"))
-                .forEach(p -> {
-                    String notify = languageManager.getMessage(p, "messages.staging-notification");
-                    p.sendMessage(notify.replace("%player%", sender.getName()).replace("%command%", commandLine));
-                });
+        auditManager.log("stage", senderName, "Command staged: " + commandLine);
+
+        if (sender instanceof Player) {
+            String msg = languageManager.getMessage((Player) sender, "messages.command-staged");
+            sender.sendMessage(msg.replace("%command%", commandLine));
+        } else {
+            sender.sendMessage("Command staged: " + commandLine);
+        }
+
+        notificationManager.notifyStaging(command);
     }
 
     public void approveCommand(StagedCommand command) {
         if (!pendingCommands.contains(command))
             return;
 
+        executeCommand(command);
+
+        pendingCommands.remove(command);
+
+        // Async delete
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            repository.delete(command);
+        });
+
+        auditManager.log("approve", "Reviewer", "Command approved: " + command.getCommandLine());
+        notificationManager.notifyApproval(command);
+    }
+
+    public void rejectCommand(StagedCommand command) {
+        if (!pendingCommands.contains(command))
+            return;
+
+        pendingCommands.remove(command);
+
+        // Async delete
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            repository.delete(command);
+        });
+
+        auditManager.log("reject", "Reviewer", "Command rejected: " + command.getCommandLine());
+        notificationManager.notifyRejection(command);
+    }
+
+    private void executeCommand(StagedCommand command) {
         Player sender = Bukkit.getPlayer(command.getSenderId());
+        String cmdToRun = command.getCommandLine();
+        if (cmdToRun.startsWith("/")) {
+            cmdToRun = cmdToRun.substring(1);
+        }
+
         if (sender != null && sender.isOnline()) {
-            String cmdToRun = command.getCommandLine();
-            if (cmdToRun.startsWith("/")) {
-                cmdToRun = cmdToRun.substring(1);
-            }
             Bukkit.dispatchCommand(sender, cmdToRun);
             plugin.getLogger().info(
                     "Executed staged command for online player " + sender.getName() + ": " + command.getCommandLine());
         } else {
             plugin.getLogger().warning("Executing staged command for OFFLINE player " + command.getSenderName() + ": "
                     + command.getCommandLine());
-
-            String cmdToRun = command.getCommandLine();
-            if (cmdToRun.startsWith("/")) {
-                cmdToRun = cmdToRun.substring(1);
-            }
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmdToRun);
         }
-
-        pendingCommands.remove(command);
-        saveCommands();
-    }
-
-    public void rejectCommand(StagedCommand command) {
-        pendingCommands.remove(command);
-        saveCommands();
     }
 
     public List<StagedCommand> getPendingCommands() {
+        pruneExpiredCommands();
         return new ArrayList<>(pendingCommands);
     }
 
-    private void loadCommands() {
-        if (!storageFile.exists())
-            return;
-
-        try (Reader reader = new FileReader(storageFile)) {
-            Type listType = new TypeToken<ArrayList<StagedCommand>>() {
-            }.getType();
-            List<StagedCommand> loaded = gson.fromJson(reader, listType);
-            if (loaded != null) {
-                pendingCommands.addAll(loaded);
+    public void pruneExpiredCommands() {
+        // Check for expired commands
+        pendingCommands.removeIf(cmd -> {
+            if (rulesEngine.isExpired(cmd)) {
+                // Async delete
+                Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                    repository.delete(cmd);
+                });
+                auditManager.log("expire", "System", "Command expired: " + cmd.getCommandLine());
+                return true;
             }
-        } catch (IOException e) {
-            plugin.getLogger().log(Level.SEVERE, "Failed to load staged commands", e);
-        }
+            return false;
+        });
     }
 
-    public void saveCommands() {
-        if (!plugin.getDataFolder().exists()) {
-            plugin.getDataFolder().mkdirs();
-        }
-
-        try (Writer writer = new FileWriter(storageFile)) {
-            gson.toJson(pendingCommands, writer);
-        } catch (IOException e) {
-            plugin.getLogger().log(Level.SEVERE, "Failed to save staged commands", e);
-        }
+    private void loadCommands() {
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            List<StagedCommand> loaded = repository.loadAll();
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                pendingCommands.clear();
+                pendingCommands.addAll(loaded);
+            });
+        });
     }
 }

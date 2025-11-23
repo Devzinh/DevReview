@@ -17,6 +17,17 @@ public class StagedCommand {
         this.timestamp = System.currentTimeMillis();
     }
 
+    // Constructor for loading from persistence
+    public StagedCommand(UUID id, UUID senderId, String senderName, String commandLine, long timestamp,
+            String justification) {
+        this.id = id;
+        this.senderId = senderId;
+        this.senderName = senderName;
+        this.commandLine = commandLine;
+        this.timestamp = timestamp;
+        this.justification = justification;
+    }
+
     public UUID getId() {
         return id;
     }
@@ -35,5 +46,15 @@ public class StagedCommand {
 
     public long getTimestamp() {
         return timestamp;
+    }
+
+    private String justification;
+
+    public String getJustification() {
+        return justification;
+    }
+
+    public void setJustification(String justification) {
+        this.justification = justification;
     }
 }

@@ -1,0 +1,10 @@
+schedules:
+  daily-restart:
+    command: "restart"
+    # cron: "0 0 4 * * ?" # Not currently supported
+    interval-seconds: 86400 # 24 hours
+    require-approval: true
+  backup:
+    command: "backup start"
+    interval-seconds: 3600 # Every hour
+    require-approval: false

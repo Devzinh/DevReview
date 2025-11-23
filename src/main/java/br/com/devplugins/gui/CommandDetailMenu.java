@@ -2,8 +2,9 @@ package br.com.devplugins.gui;
 
 import br.com.devplugins.staging.StagedCommand;
 import br.com.devplugins.staging.StagingManager;
+import br.com.devplugins.utils.CategoryManager;
 import org.bukkit.Bukkit;
-
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -21,18 +22,21 @@ public class CommandDetailMenu implements InventoryHolder {
     private final Inventory inventory;
     private final br.com.devplugins.lang.LanguageManager languageManager;
     private final Player viewer;
+    private final CategoryManager categoryManager;
 
     public CommandDetailMenu(StagingManager stagingManager, StagedCommand command,
-            br.com.devplugins.lang.LanguageManager languageManager, Player viewer) {
+            br.com.devplugins.lang.LanguageManager languageManager, Player viewer, CategoryManager categoryManager) {
         this.command = command;
         this.languageManager = languageManager;
         this.viewer = viewer;
+        this.categoryManager = categoryManager;
         this.inventory = Bukkit.createInventory(this, 27, languageManager.getMessage(viewer, "gui.detail-title"));
         loadItems();
     }
 
     private void loadItems() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        CategoryManager.Category category = categoryManager.getCategory(command.getCommandLine());
 
         // Info Item
         ItemStack info = new ItemStack(Material.BOOK);
@@ -46,8 +50,10 @@ public class CommandDetailMenu implements InventoryHolder {
                     command.getCommandLine());
             String infoTime = languageManager.getMessage(viewer, "gui.items.info-time").replace("%time%",
                     sdf.format(new Date(command.getTimestamp())));
+            String categoryLine = ChatColor.GRAY + "Category: " + category.getDisplayName();
 
             infoMeta.setLore(Arrays.asList(
+                    categoryLine,
                     infoPlayer,
                     infoCommand,
                     infoTime));

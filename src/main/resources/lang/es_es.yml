@@ -1,10 +1,15 @@
 messages:
   command-staged: "&e[DevReview] Comando enviado para revisión: %command%"
-  bypass-notification: "&c[DevReview] Revisión omitida para: %command%"
+  bypass-player-notification: "&eRevisión omitida para: %command%"
+  bypass-admin-notification: "&c[DevReview] %player% omitió la revisión para: %command%"
   staging-notification: "&c[Staging] &eNuevo comando de %player%: &7%command%"
   only-players: "&cSolo los jugadores pueden usar este comando."
   command-approved: "&aComando aprobado."
   command-rejected: "&cComando rechazado."
+  approval-notification: "&a[DevReview] Comando de %player% aprobado: %command%"
+  rejection-notification: "&c[DevReview] Comando de %player% rechazado: %command%"
+  enter-justification-approve: "&ePor favor, ingrese una justificación para la APROBACIÓN en el chat:"
+  enter-justification-reject: "&ePor favor, ingrese una justificación para el RECHAZO en el chat:"
 gui:
   review-title: "Revisiones Pendientes"
   detail-title: "Revisar Comando"

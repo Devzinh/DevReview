@@ -1,0 +1,27 @@
+categories:
+  critical:
+    priority: 1
+    display-name: "&cCritical"
+    commands:
+      - "op"
+      - "stop"
+      - "reload"
+      - "restart"
+  moderation:
+    priority: 2
+    display-name: "&eModeration"
+    commands:
+      - "ban"
+      - "kick"
+      - "mute"
+      - "tempban"
+  utility:
+    priority: 3
+    display-name: "&bUtility"
+    commands:
+      - "gamemode"
+      - "tp"
+      - "give"
+default:
+  priority: 99
+  display-name: "&7General"

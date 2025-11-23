@@ -1,10 +1,15 @@
 messages:
   command-staged: "&e[DevReview] Polecenie oczekuje na przegląd: %command%"
-  bypass-notification: "&c[DevReview] Pominięto przegląd dla: %command%"
+  bypass-player-notification: "&ePominięto przegląd dla: %command%"
+  bypass-admin-notification: "&c[DevReview] %player% pominął przegląd dla: %command%"
   staging-notification: "&c[Staging] &eNowe polecenie od %player%: &7%command%"
   only-players: "&cTylko gracze mogą używać tego polecenia."
   command-approved: "&aPolecenie zatwierdzone."
   command-rejected: "&cPolecenie odrzucone."
+  approval-notification: "&a[DevReview] Polecenie od %player% zatwierdzone: %command%"
+  rejection-notification: "&c[DevReview] Polecenie od %player% odrzucone: %command%"
+  enter-justification-approve: "&eProszę podać uzasadnienie ZATWIERDZENIA na czacie:"
+  enter-justification-reject: "&eProszę podać uzasadnienie ODRZUCENIA na czacie:"
 gui:
   review-title: "Oczekujące przeglądy"
   detail-title: "Przegląd polecenia"
