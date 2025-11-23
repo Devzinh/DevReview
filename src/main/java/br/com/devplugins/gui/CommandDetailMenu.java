@@ -50,7 +50,8 @@ public class CommandDetailMenu implements InventoryHolder {
                     command.getCommandLine());
             String infoTime = languageManager.getMessage(viewer, "gui.items.info-time").replace("%time%",
                     sdf.format(new Date(command.getTimestamp())));
-            String categoryLine = ChatColor.GRAY + "Category: " + category.getDisplayName();
+            String categoryLabel = languageManager.getMessage(viewer, "messages.category-label");
+            String categoryLine = categoryLabel + category.getDisplayName();
 
             infoMeta.setLore(Arrays.asList(
                     categoryLine,

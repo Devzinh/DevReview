@@ -10,6 +10,7 @@ messages:
   rejection-notification: "&c[DevReview] Polecenie od %player% odrzucone: %command%"
   enter-justification-approve: "&eProszę podać uzasadnienie ZATWIERDZENIA na czacie:"
   enter-justification-reject: "&eProszę podać uzasadnienie ODRZUCENIA na czacie:"
+  category-label: "&7Kategoria: "
 gui:
   review-title: "Oczekujące przeglądy"
   detail-title: "Przegląd polecenia"

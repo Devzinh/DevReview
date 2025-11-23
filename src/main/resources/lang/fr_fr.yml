@@ -10,6 +10,7 @@ messages:
   rejection-notification: "&c[DevReview] Commande de %player% rejetée : %command%"
   enter-justification-approve: "&eVeuillez saisir une justification pour l'APPROBATION dans le chat :"
   enter-justification-reject: "&eVeuillez saisir une justification pour le REJET dans le chat :"
+  category-label: "&7Catégorie : "
 gui:
   review-title: "Examens en attente"
   detail-title: "Examiner la commande"

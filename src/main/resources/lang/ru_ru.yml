@@ -10,6 +10,7 @@ messages:
   rejection-notification: "&c[DevReview] Команда от %player% отклонена: %command%"
   enter-justification-approve: "&eПожалуйста, введите обоснование ОДОБРЕНИЯ в чате:"
   enter-justification-reject: "&eПожалуйста, введите обоснование ОТКЛОНЕНИЯ в чате:"
+  category-label: "&7Категория: "
 gui:
   review-title: "Ожидающие проверки"
   detail-title: "Проверка команды"

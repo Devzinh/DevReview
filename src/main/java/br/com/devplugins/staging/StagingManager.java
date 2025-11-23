@@ -69,12 +69,8 @@ public class StagingManager {
 
         auditManager.log("stage", senderName, "Command staged: " + commandLine);
 
-        if (sender instanceof Player) {
-            String msg = languageManager.getMessage((Player) sender, "messages.command-staged");
-            sender.sendMessage(msg.replace("%command%", commandLine));
-        } else {
-            sender.sendMessage("Command staged: " + commandLine);
-        }
+        String msg = languageManager.getMessage(sender, "messages.command-staged");
+        sender.sendMessage(msg.replace("%command%", commandLine));
 
         notificationManager.notifyStaging(command);
     }

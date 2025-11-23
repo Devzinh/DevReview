@@ -10,6 +10,7 @@ messages:
   rejection-notification: "&c[DevReview] Befehl von %player% abgelehnt: %command%"
   enter-justification-approve: "&eBitte geben Sie eine Begründung für die GENEHMIGUNG im Chat ein:"
   enter-justification-reject: "&eBitte geben Sie eine Begründung für die ABLEHNUNG im Chat ein:"
+  category-label: "&7Kategorie: "
 gui:
   review-title: "Ausstehende Überprüfungen"
   detail-title: "Befehl überprüfen"

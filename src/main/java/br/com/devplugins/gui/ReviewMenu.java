@@ -68,7 +68,8 @@ public class ReviewMenu implements InventoryHolder {
                         cmd.getId().toString());
                 String clickReview = languageManager.getMessage(viewer, "gui.items.click-to-review");
 
-                String categoryLine = ChatColor.GRAY + "Category: " + category.getDisplayName();
+                String categoryLabel = languageManager.getMessage(viewer, "messages.category-label");
+                String categoryLine = categoryLabel + category.getDisplayName();
 
                 meta.setLore(Arrays.asList(
                         categoryLine,
