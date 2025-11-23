@@ -28,6 +28,7 @@ tasks {
 
 shadowJar {
     relocate 'org.bstats', 'br.com.devplugins.shadow.bstats'
+    archiveClassifier.set('')
 }
 
 build {
