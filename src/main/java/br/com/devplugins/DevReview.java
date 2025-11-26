@@ -99,8 +99,10 @@ public final class DevReview extends JavaPlugin {
                 .setExecutor(new br.com.devplugins.commands.RankingCommand(rankingManager, languageManager));
 
         if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
-            new br.com.devplugins.placeholders.RankingPlaceholderExpansion(this, rankingManager, languageManager)
-                    .register();
+            if (new br.com.devplugins.placeholders.RankingPlaceholderExpansion(this, rankingManager, languageManager)
+                    .register()) {
+                getLogger().info("Ranking placeholders registered successfully!");
+            }
         }
     }
 

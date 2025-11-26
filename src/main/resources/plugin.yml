@@ -6,6 +6,7 @@ prefix: [ DReview ]
 authors: [ DevPlugins ]
 description: Staging and review system for administrative commands.
 website: https://discord.gg/bdxGxCbqCj
+softdepend: [PlaceholderAPI, Vault]
 
 commands:
   review:
