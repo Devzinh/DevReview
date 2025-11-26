@@ -35,7 +35,7 @@ public class CommandInterceptor implements Listener {
 
         List<String> criticalCommands = plugin.getConfig().getStringList("critical-commands");
         if (criticalCommands.isEmpty()) {
-            criticalCommands = Arrays.asList("/op", "/stop", "/reload", "/restart", "/ban", "/deop");
+            criticalCommands = Arrays.asList("/op", "/deop", "/stop", "/reload", "/restart", "/ban", "/kick");
         }
 
         if (criticalCommands.contains(command)) {

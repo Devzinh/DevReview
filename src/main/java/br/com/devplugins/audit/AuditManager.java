@@ -50,6 +50,8 @@ public class AuditManager {
     }
 
     private void startLogTask() {
+        // Only start the periodic flush task if file logging is enabled.
+        // Console logging is handled directly in the log() method.
         if (!logToFile)
             return;
 

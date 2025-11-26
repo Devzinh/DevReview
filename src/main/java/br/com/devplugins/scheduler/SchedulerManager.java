@@ -53,7 +53,7 @@ public class SchedulerManager {
     private void scheduleInterval(String id, String command, boolean requireApproval, int intervalSeconds) {
         Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             if (requireApproval) {
-                stagingManager.stageCommand(Bukkit.getConsoleSender(), command);
+                stagingManager.stageCommand(Bukkit.getConsoleSender(), command, false);
             } else {
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
             }

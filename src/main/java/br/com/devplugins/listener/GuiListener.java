@@ -63,7 +63,6 @@ public class GuiListener implements Listener {
             event.setCancelled(true);
             Consumer<String> action = awaitingJustification.remove(player.getUniqueId());
 
-            // Run on main thread because we might call Bukkit API
             org.bukkit.Bukkit.getScheduler().runTask(org.bukkit.plugin.java.JavaPlugin.getProvidingPlugin(getClass()),
                     () -> {
                         action.accept(event.getMessage());
@@ -76,14 +75,17 @@ public class GuiListener implements Listener {
         if (item == null || item.getType() == Material.AIR)
             return;
 
-        List<String> lore = item.getItemMeta().getLore();
+        org.bukkit.inventory.meta.ItemMeta meta = item.getItemMeta();
+        if (meta == null)
+            return;
+
+        List<String> lore = meta.getLore();
         if (lore == null)
             return;
 
         String idString = null;
 
-        // Read ID from PersistentDataContainer
-        org.bukkit.persistence.PersistentDataContainer data = item.getItemMeta().getPersistentDataContainer();
+        org.bukkit.persistence.PersistentDataContainer data = meta.getPersistentDataContainer();
         org.bukkit.NamespacedKey key = new org.bukkit.NamespacedKey(
                 org.bukkit.plugin.java.JavaPlugin.getProvidingPlugin(getClass()), "command_id");
 

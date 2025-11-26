@@ -22,6 +22,8 @@ public class StagingManager {
     private final NotificationManager notificationManager;
     private final RulesEngine rulesEngine;
     private final RankingManager rankingManager;
+    // Thread-safe list for pending commands, though most operations should happen
+    // on the main thread.
     private final List<StagedCommand> pendingCommands;
     private final CommandHistoryManager historyManager;
 
@@ -39,7 +41,8 @@ public class StagingManager {
         this.notificationManager = notificationManager;
         this.rulesEngine = rulesEngine;
         this.rankingManager = rankingManager;
-        this.pendingCommands = new ArrayList<>();
+        // Use CopyOnWriteArrayList for thread safety as requested
+        this.pendingCommands = new java.util.concurrent.CopyOnWriteArrayList<>();
         this.historyManager = new CommandHistoryManager(plugin);
         loadCommands();
     }
@@ -49,6 +52,10 @@ public class StagingManager {
     }
 
     public void stageCommand(CommandSender sender, String commandLine) {
+        stageCommand(sender, commandLine, true);
+    }
+
+    public void stageCommand(CommandSender sender, String commandLine, boolean allowAutoApprove) {
         UUID senderId;
         String senderName;
 
@@ -62,8 +69,8 @@ public class StagingManager {
 
         StagedCommand command = new StagedCommand(senderId, senderName, commandLine);
 
-        // Check auto-approve rule
-        if (rulesEngine.shouldAutoApprove()) {
+        // Check auto-approve rule only if allowed
+        if (allowAutoApprove && rulesEngine.shouldAutoApprove()) {
             executeCommand(command);
             auditManager.log("approve", "Auto-Approve", "Command auto-approved by rules: " + commandLine);
             notificationManager.notifyApproval(command);

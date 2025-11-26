@@ -1,6 +1,7 @@
 # DevReview Configuration
 
 # List of commands that require review
+# This list is the single source of truth. Code fallback is only used if this is empty.
 critical-commands:
   - "/op"
   - "/deop"

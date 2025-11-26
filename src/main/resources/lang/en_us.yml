@@ -38,7 +38,6 @@ gui:
     list-time: "&7Time: &f%time%"
     list-id: "&7ID: &8%id%"
     requester-name: "&eRequester: &f%player%"
-    requester-name: "&eRequester: &f%player%"
     requester-label: "&7Requested by:"
   ranking:
     header: "&6=== Employee Ranking ==="
@@ -48,8 +47,6 @@ gui:
     rank-first: "&a&l[1st] "
     rank-last: "&c[Last] "
     rank-other: "&7[%rank%] "
-  gui:
-    ranking-title: "Employee Ranking"
-    ranking:
-      lore-approvals: "&fApprovals: &a%count%"
-      lore-rejections: "&fRejections: &c%count%"
+  ranking-title: "Employee Ranking"
+  ranking-lore-approvals: "&fApprovals: &a%count%"
+  ranking-lore-rejections: "&fRejections: &c%count%"

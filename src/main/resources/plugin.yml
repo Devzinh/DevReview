@@ -17,6 +17,7 @@ commands:
   mystatus:
     description: Opens the status menu to view your command request history.
     usage: /mystatus
+    permission: devreview.mystatus
     permission-message: §cYou do not have permission to use this command.
   devrank:
     description: Shows the employee ranking.

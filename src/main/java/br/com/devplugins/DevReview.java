@@ -88,6 +88,10 @@ public final class DevReview extends JavaPlugin {
                 sender.sendMessage(languageManager.getMessage(sender, "messages.only-players"));
                 return true;
             }
+            if (!sender.hasPermission("devreview.mystatus")) {
+                sender.sendMessage(languageManager.getMessage(sender, "messages.no-permission"));
+                return true;
+            }
             new br.com.devplugins.gui.CommandStatusMenu(stagingManager, languageManager,
                     (org.bukkit.entity.Player) sender,
                     categoryManager)
