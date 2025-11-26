@@ -16,25 +16,75 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.util.function.Supplier;
 
+/**
+ * Manages multi-channel notifications for command staging events.
+ * 
+ * <p>This class provides a flexible notification system that can deliver messages through
+ * multiple channels simultaneously. Notifications are sent for staging, approval, rejection,
+ * and bypass events.</p>
+ * 
+ * <h2>Notification Channels:</h2>
+ * <ul>
+ *   <li><b>Chat</b>: Standard chat messages</li>
+ *   <li><b>Action Bar</b>: Text above the hotbar</li>
+ *   <li><b>Title</b>: Large text overlay on screen</li>
+ *   <li><b>Sound</b>: Audio notification</li>
+ * </ul>
+ * 
+ * <h2>Notification Types:</h2>
+ * <ul>
+ *   <li><b>Staging</b>: Sent to all admins when a command is staged</li>
+ *   <li><b>Approval</b>: Sent to admins (optional) and command sender</li>
+ *   <li><b>Rejection</b>: Sent to admins and command sender</li>
+ *   <li><b>Bypass</b>: Sent to all admins when a command bypasses staging</li>
+ * </ul>
+ * 
+ * <h2>Auto-Opening Status Menu:</h2>
+ * <p>When a command is approved or rejected, the sender's status menu is automatically
+ * opened after a 1-second delay (if the player is online).</p>
+ * 
+ * <h2>Circular Dependency Resolution:</h2>
+ * <p>This class uses a {@link Supplier} pattern to lazily access StagingManager, avoiding
+ * circular dependency issues during initialization.</p>
+ * 
+ * <h2>Configuration:</h2>
+ * <p>Notification behavior is configured in notifications.yml with granular control over
+ * each channel for each event type.</p>
+ * 
+ * <h2>Thread Safety:</h2>
+ * <p>All notification methods should be called from the main thread to ensure proper
+ * interaction with the Bukkit API.</p>
+ * 
+ * @see LanguageManager
+ * @see StagingManager
+ * @author DevPlugins
+ * @version 1.0
+ * @since 1.0
+ */
 public class NotificationManager {
 
     private final JavaPlugin plugin;
     private final LanguageManager languageManager;
-    private StagingManager stagingManager;
     private final CategoryManager categoryManager;
     private YamlConfiguration config;
+    // Use a supplier to lazily get StagingManager to avoid circular dependency
+    private Supplier<StagingManager> stagingManagerSupplier;
 
-    public NotificationManager(JavaPlugin plugin, LanguageManager languageManager, StagingManager stagingManager, CategoryManager categoryManager) {
+    public NotificationManager(JavaPlugin plugin, LanguageManager languageManager, CategoryManager categoryManager) {
         this.plugin = plugin;
         this.languageManager = languageManager;
-        this.stagingManager = stagingManager;
         this.categoryManager = categoryManager;
         loadConfig();
     }
 
-    public void setStagingManager(StagingManager stagingManager) {
-        this.stagingManager = stagingManager;
+    /**
+     * Set the staging manager supplier for opening status menus.
+     * This uses a supplier pattern to avoid circular dependency.
+     */
+    public void setStagingManagerSupplier(Supplier<StagingManager> stagingManagerSupplier) {
+        this.stagingManagerSupplier = stagingManagerSupplier;
     }
 
     private void loadConfig() {
@@ -62,10 +112,13 @@ public class NotificationManager {
         if (sender != null && sender.isOnline()) {
             sendNotificationToPlayer(sender, "approval", command);
             // Open status menu after a short delay
-            if (stagingManager != null) {
+            if (stagingManagerSupplier != null) {
                 Bukkit.getScheduler().runTaskLater(plugin, () -> {
                     if (sender.isOnline()) {
-                        new CommandStatusMenu(stagingManager, languageManager, sender, categoryManager).open(sender);
+                        StagingManager stagingManager = stagingManagerSupplier.get();
+                        if (stagingManager != null) {
+                            new CommandStatusMenu(stagingManager, languageManager, sender, categoryManager).open(sender);
+                        }
                     }
                 }, 20L);
             }
@@ -79,10 +132,13 @@ public class NotificationManager {
         if (sender != null && sender.isOnline()) {
             sendNotificationToPlayer(sender, "rejection", command);
             // Open status menu after a short delay
-            if (stagingManager != null) {
+            if (stagingManagerSupplier != null) {
                 Bukkit.getScheduler().runTaskLater(plugin, () -> {
                     if (sender.isOnline()) {
-                        new CommandStatusMenu(stagingManager, languageManager, sender, categoryManager).open(sender);
+                        StagingManager stagingManager = stagingManagerSupplier.get();
+                        if (stagingManager != null) {
+                            new CommandStatusMenu(stagingManager, languageManager, sender, categoryManager).open(sender);
+                        }
                     }
                 }, 20L);
             }

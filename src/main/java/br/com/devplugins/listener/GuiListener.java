@@ -23,18 +23,24 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
+import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitTask;
+
 public class GuiListener implements Listener {
 
     private final StagingManager stagingManager;
     private final br.com.devplugins.lang.LanguageManager languageManager;
     private final CategoryManager categoryManager;
+    private final Plugin plugin;
     private final Map<UUID, Consumer<String>> awaitingJustification = new ConcurrentHashMap<>();
+    private final Map<UUID, BukkitTask> justificationTimeouts = new ConcurrentHashMap<>();
 
     public GuiListener(StagingManager stagingManager, br.com.devplugins.lang.LanguageManager languageManager,
-            CategoryManager categoryManager) {
+            CategoryManager categoryManager, Plugin plugin) {
         this.stagingManager = stagingManager;
         this.languageManager = languageManager;
         this.categoryManager = categoryManager;
+        this.plugin = plugin;
     }
 
     @EventHandler
@@ -59,14 +65,20 @@ public class GuiListener implements Listener {
     @EventHandler
     public void onChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
-        if (awaitingJustification.containsKey(player.getUniqueId())) {
+        UUID playerId = player.getUniqueId();
+        if (awaitingJustification.containsKey(playerId)) {
             event.setCancelled(true);
-            Consumer<String> action = awaitingJustification.remove(player.getUniqueId());
+            Consumer<String> action = awaitingJustification.remove(playerId);
+            
+            // Cancel the timeout task since player responded
+            BukkitTask timeoutTask = justificationTimeouts.remove(playerId);
+            if (timeoutTask != null) {
+                timeoutTask.cancel();
+            }
 
-            org.bukkit.Bukkit.getScheduler().runTask(org.bukkit.plugin.java.JavaPlugin.getProvidingPlugin(getClass()),
-                    () -> {
-                        action.accept(event.getMessage());
-                    });
+            org.bukkit.Bukkit.getScheduler().runTask(plugin, () -> {
+                action.accept(event.getMessage());
+            });
         }
     }
 
@@ -128,6 +140,7 @@ public class GuiListener implements Listener {
                 player.sendMessage(languageManager.getMessage(player, "messages.command-approved"));
                 new ReviewMenu(stagingManager, languageManager, player, categoryManager).open(player);
             });
+            scheduleJustificationTimeout(player);
 
         } else if (item.getType() == Material.RED_WOOL) {
             player.closeInventory();
@@ -138,6 +151,38 @@ public class GuiListener implements Listener {
                 player.sendMessage(languageManager.getMessage(player, "messages.command-rejected"));
                 new ReviewMenu(stagingManager, languageManager, player, categoryManager).open(player);
             });
+            scheduleJustificationTimeout(player);
         }
+    }
+
+    /**
+     * Schedules a timeout task for justification input.
+     * After 60 seconds, clears the awaiting state, notifies the player, and reopens ReviewMenu.
+     */
+    private void scheduleJustificationTimeout(Player player) {
+        UUID playerId = player.getUniqueId();
+        
+        // Cancel any existing timeout for this player
+        BukkitTask existingTask = justificationTimeouts.get(playerId);
+        if (existingTask != null) {
+            existingTask.cancel();
+        }
+        
+        // Schedule new timeout task (60 seconds = 1200 ticks)
+        BukkitTask timeoutTask = org.bukkit.Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            // Remove from awaiting map
+            awaitingJustification.remove(playerId);
+            justificationTimeouts.remove(playerId);
+            
+            // Notify player if still online
+            Player onlinePlayer = org.bukkit.Bukkit.getPlayer(playerId);
+            if (onlinePlayer != null && onlinePlayer.isOnline()) {
+                onlinePlayer.sendMessage(languageManager.getMessage(onlinePlayer, "messages.justification-timeout"));
+                // Reopen ReviewMenu
+                new ReviewMenu(stagingManager, languageManager, onlinePlayer, categoryManager).open(onlinePlayer);
+            }
+        }, 1200L); // 60 seconds
+        
+        justificationTimeouts.put(playerId, timeoutTask);
     }
 }

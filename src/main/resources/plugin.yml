@@ -24,6 +24,11 @@ commands:
     usage: /devrank
     permission: devreview.rank
     permission-message: §cYou do not have permission to use this command.
+  devreview:
+    description: Shows system metrics and statistics.
+    usage: /devreview stats
+    permission: devreview.stats
+    permission-message: §cYou do not have permission to use this command.
 
 permissions:
   devreview.admin:
@@ -35,3 +40,6 @@ permissions:
   devreview.rank:
     description: Allows viewing the employee ranking.
     default: true
+  devreview.stats:
+    description: Allows viewing system metrics and statistics.
+    default: op

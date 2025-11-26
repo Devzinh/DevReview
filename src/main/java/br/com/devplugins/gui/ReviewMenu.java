@@ -18,6 +18,56 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * GUI for reviewing pending staged commands.
+ * 
+ * <p>This inventory-based GUI displays all pending commands in a 54-slot chest interface,
+ * allowing administrators to see an overview of commands awaiting review. Clicking on a
+ * command opens the detailed review menu.</p>
+ * 
+ * <h2>Display Format:</h2>
+ * <p>Each command is represented by a PAPER item with:</p>
+ * <ul>
+ *   <li><b>Display Name</b>: Category color + sender name</li>
+ *   <li><b>Lore</b>: Category, command text, timestamp, UUID, and click prompt</li>
+ * </ul>
+ * 
+ * <h2>Ordering:</h2>
+ * <p>Commands are sorted by:</p>
+ * <ol>
+ *   <li>Category priority (ascending) - Critical commands first</li>
+ *   <li>Timestamp (ascending) - Oldest commands first</li>
+ * </ol>
+ * 
+ * <p>This ensures that high-priority, time-sensitive commands appear at the top of the list.</p>
+ * 
+ * <h2>Capacity:</h2>
+ * <p>The GUI can display up to 54 commands (6 rows). If more commands are pending, only
+ * the first 54 (after sorting) are shown.</p>
+ * 
+ * <h2>Data Storage:</h2>
+ * <p>Each item stores the command UUID in its PersistentDataContainer, allowing the
+ * GuiListener to identify which command was clicked.</p>
+ * 
+ * <h2>Internationalization:</h2>
+ * <p>All text is localized based on the viewer's locale using LanguageManager.</p>
+ * 
+ * <h2>Thread Safety:</h2>
+ * <p>This class should only be instantiated and used on the main thread, as it interacts
+ * with the Bukkit inventory API.</p>
+ * 
+ * <h2>Example Usage:</h2>
+ * <pre>{@code
+ * ReviewMenu menu = new ReviewMenu(stagingManager, languageManager, player, categoryManager);
+ * menu.open(player);
+ * }</pre>
+ * 
+ * @see CommandDetailMenu
+ * @see br.com.devplugins.listener.GuiListener
+ * @author DevPlugins
+ * @version 1.0
+ * @since 1.0
+ */
 public class ReviewMenu implements InventoryHolder {
 
     private final StagingManager stagingManager;
@@ -91,10 +141,23 @@ public class ReviewMenu implements InventoryHolder {
         }
     }
 
+    /**
+     * Opens this GUI for a player.
+     * 
+     * @param player the player to show the GUI to
+     */
     public void open(Player player) {
         player.openInventory(inventory);
     }
 
+    /**
+     * Gets the inventory for this GUI.
+     * 
+     * <p>This method is required by the InventoryHolder interface and allows the
+     * GuiListener to identify this GUI when handling click events.</p>
+     * 
+     * @return the inventory instance
+     */
     @Override
     public Inventory getInventory() {
         return inventory;

@@ -49,21 +49,53 @@ public class SqlStagedCommandRepository implements StagedCommandRepository {
                 "sender_id VARCHAR(36), " +
                 "sender_name VARCHAR(64), " +
                 "command_line TEXT, " +
-                "timestamp BIGINT" +
+                "timestamp BIGINT, " +
+                "justification TEXT, " +
+                "INDEX idx_sender_id (sender_id), " +
+                "INDEX idx_timestamp (timestamp)" +
                 ");";
 
         try (Connection conn = getConnection();
                 Statement stmt = conn.createStatement()) {
             stmt.execute(sql);
+            // Add justification column if it doesn't exist (for existing tables)
+            addJustificationColumnIfNeeded(conn);
+            // Add indexes if they don't exist (for existing tables)
+            addIndexesIfNeeded(conn);
         } catch (SQLException e) {
             plugin.getLogger().log(Level.SEVERE, "Failed to initialize database table", e);
+        }
+    }
+
+    private void addJustificationColumnIfNeeded(Connection conn) {
+        try (Statement stmt = conn.createStatement()) {
+            // Try to add the column - will fail silently if it already exists
+            String alterSql = "ALTER TABLE " + tablePrefix + "staged_commands ADD COLUMN justification TEXT";
+            stmt.execute(alterSql);
+        } catch (SQLException e) {
+            // Column likely already exists, ignore
+        }
+    }
+    
+    private void addIndexesIfNeeded(Connection conn) {
+        // Try to add indexes - will fail silently if they already exist
+        try (Statement stmt = conn.createStatement()) {
+            stmt.execute("CREATE INDEX idx_sender_id ON " + tablePrefix + "staged_commands (sender_id)");
+        } catch (SQLException e) {
+            // Index likely already exists, ignore
+        }
+        
+        try (Statement stmt = conn.createStatement()) {
+            stmt.execute("CREATE INDEX idx_timestamp ON " + tablePrefix + "staged_commands (timestamp)");
+        } catch (SQLException e) {
+            // Index likely already exists, ignore
         }
     }
 
     @Override
     public void save(StagedCommand command) {
         String sql = "REPLACE INTO " + tablePrefix
-                + "staged_commands (id, sender_id, sender_name, command_line, timestamp) VALUES (?, ?, ?, ?, ?)";
+                + "staged_commands (id, sender_id, sender_name, command_line, timestamp, justification) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -72,6 +104,7 @@ public class SqlStagedCommandRepository implements StagedCommandRepository {
             pstmt.setString(3, command.getSenderName());
             pstmt.setString(4, command.getCommandLine());
             pstmt.setLong(5, command.getTimestamp());
+            pstmt.setString(6, command.getJustification());
             pstmt.executeUpdate();
         } catch (SQLException e) {
             plugin.getLogger().log(Level.SEVERE, "Failed to save command to SQL", e);
@@ -106,8 +139,7 @@ public class SqlStagedCommandRepository implements StagedCommandRepository {
                 String senderName = rs.getString("sender_name");
                 String commandLine = rs.getString("command_line");
                 long timestamp = rs.getLong("timestamp");
-                // Justification is not persisted
-                String justification = null;
+                String justification = rs.getString("justification");
 
                 StagedCommand cmd = new StagedCommand(id, senderId, senderName, commandLine, timestamp, justification);
                 list.add(cmd);
@@ -116,5 +148,63 @@ public class SqlStagedCommandRepository implements StagedCommandRepository {
             plugin.getLogger().log(Level.SEVERE, "Failed to load commands from SQL", e);
         }
         return list;
+    }
+    
+    @Override
+    public void saveAll(List<StagedCommand> commands) {
+        if (commands.isEmpty()) {
+            return;
+        }
+        
+        String sql = "REPLACE INTO " + tablePrefix
+                + "staged_commands (id, sender_id, sender_name, command_line, timestamp, justification) VALUES (?, ?, ?, ?, ?, ?)";
+
+        try (Connection conn = getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            conn.setAutoCommit(false); // Start transaction
+            
+            for (StagedCommand command : commands) {
+                pstmt.setString(1, command.getId().toString());
+                pstmt.setString(2, command.getSenderId().toString());
+                pstmt.setString(3, command.getSenderName());
+                pstmt.setString(4, command.getCommandLine());
+                pstmt.setLong(5, command.getTimestamp());
+                pstmt.setString(6, command.getJustification());
+                pstmt.addBatch();
+            }
+            
+            pstmt.executeBatch();
+            conn.commit(); // Commit transaction
+            
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, "Failed to batch save commands to SQL", e);
+        }
+    }
+    
+    @Override
+    public void deleteAll(List<StagedCommand> commands) {
+        if (commands.isEmpty()) {
+            return;
+        }
+        
+        String sql = "DELETE FROM " + tablePrefix + "staged_commands WHERE id = ?";
+
+        try (Connection conn = getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            conn.setAutoCommit(false); // Start transaction
+            
+            for (StagedCommand command : commands) {
+                pstmt.setString(1, command.getId().toString());
+                pstmt.addBatch();
+            }
+            
+            pstmt.executeBatch();
+            conn.commit(); // Commit transaction
+            
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, "Failed to batch delete commands from SQL", e);
+        }
     }
 }

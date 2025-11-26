@@ -1,0 +1,35 @@
+# Retry Configuration for Repository Operations
+# This configuration controls retry logic and circuit breaker behavior for database/file operations
+
+# Enable retry logic (if false, operations fail immediately without retry)
+enabled: true
+
+# Maximum number of retry attempts before giving up
+# Default: 3 (total of 4 attempts including the initial one)
+max-retries: 3
+
+# Base delay in milliseconds for exponential backoff
+# Actual delay = base-delay * 2^attempt
+# Example: 100ms, 200ms, 400ms, 800ms...
+# Default: 100
+base-delay-ms: 100
+
+# Maximum delay cap in milliseconds
+# Prevents exponential backoff from growing too large
+# Default: 5000 (5 seconds)
+max-delay-ms: 5000
+
+# Circuit Breaker Configuration
+circuit-breaker:
+  # Enable circuit breaker (if false, circuit breaker is disabled)
+  enabled: true
+  
+  # Number of consecutive failures before opening the circuit
+  # When circuit is open, all operations are rejected immediately
+  # Default: 5
+  failure-threshold: 5
+  
+  # Cooldown period in milliseconds before attempting to close the circuit
+  # After this period, the circuit enters "half-open" state and tries one operation
+  # Default: 30000 (30 seconds)
+  cooldown-ms: 30000

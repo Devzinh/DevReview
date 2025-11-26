@@ -13,6 +13,66 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Manages reviewer rankings and statistics.
+ * 
+ * <p>This class tracks approval and rejection counts for each reviewer, maintaining a
+ * leaderboard that can be displayed in-game. Rankings are persisted to disk and can be
+ * reset periodically (weekly or monthly).</p>
+ * 
+ * <h2>Tracked Statistics:</h2>
+ * <ul>
+ *   <li><b>Approvals</b>: Number of commands approved by each reviewer</li>
+ *   <li><b>Rejections</b>: Number of commands rejected by each reviewer</li>
+ * </ul>
+ * 
+ * <h2>Ranking Order:</h2>
+ * <p>Reviewers are ranked by approval count in descending order (most approvals first).
+ * This encourages active participation in the review process.</p>
+ * 
+ * <h2>Reset Periods:</h2>
+ * <ul>
+ *   <li><b>WEEKLY</b>: Rankings reset every Monday at midnight</li>
+ *   <li><b>MONTHLY</b>: Rankings reset on the first day of each month</li>
+ * </ul>
+ * 
+ * <h2>Persistence:</h2>
+ * <p>Rankings are persisted to ranking.yml with the following structure:</p>
+ * <pre>
+ * last-reset: "2024-01-01T00:00:00"
+ * data:
+ *   uuid1:
+ *     name: "PlayerName"
+ *     approvals: 42
+ *     rejections: 5
+ * </pre>
+ * 
+ * <h2>Thread Safety:</h2>
+ * <p>This class uses a HashMap for rankings (not thread-safe). All modifications should
+ * occur on the main thread. Persistence operations are executed asynchronously.</p>
+ * 
+ * <h2>PlaceholderAPI Integration:</h2>
+ * <p>Rankings can be displayed using PlaceholderAPI placeholders for use in other plugins
+ * (scoreboards, chat prefixes, etc.).</p>
+ * 
+ * <h2>Example Usage:</h2>
+ * <pre>{@code
+ * // Add approval
+ * rankingManager.addApproval(reviewerUUID, "ReviewerName");
+ * 
+ * // Add rejection
+ * rankingManager.addRejection(reviewerUUID, "ReviewerName");
+ * 
+ * // Get rankings
+ * List<RankingData> rankings = rankingManager.getRankings();
+ * }</pre>
+ * 
+ * @see RankingData
+ * @see br.com.devplugins.placeholders.RankingPlaceholderExpansion
+ * @author DevPlugins
+ * @version 1.0
+ * @since 1.0
+ */
 public class RankingManager {
 
     private final JavaPlugin plugin;

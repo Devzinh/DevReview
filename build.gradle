@@ -25,11 +25,33 @@ dependencies {
     compileOnly "com.github.MilkBowl:VaultAPI:1.7"
     compileOnly "me.clip:placeholderapi:2.11.6"
     compileOnly "org.jetbrains:annotations:24.0.0"
+    
+    // Property-based testing with jqwik
+    testImplementation "net.jqwik:jqwik:1.8.2"
+    testImplementation "org.junit.jupiter:junit-jupiter:5.10.1"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+    
+    // Mockito for mocking Bukkit components
+    testImplementation "org.mockito:mockito-core:5.8.0"
+    testImplementation "org.mockito:mockito-junit-jupiter:5.8.0"
+    
+    // Spigot API for tests
+    testImplementation("org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT")
 }
 
 tasks {
     runServer {
         minecraftVersion("1.21")
+    }
+    
+    test {
+        useJUnitPlatform {
+            includeEngines "jqwik", "junit-jupiter"
+        }
+        testLogging {
+            events "passed", "skipped", "failed"
+            exceptionFormat "full"
+        }
     }
 }
 
