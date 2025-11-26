@@ -4,13 +4,14 @@ import br.com.devplugins.staging.StagedCommand;
 import br.com.devplugins.staging.StagingManager;
 import br.com.devplugins.utils.CategoryManager;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -38,7 +39,8 @@ public class CommandDetailMenu implements InventoryHolder {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         CategoryManager.Category category = categoryManager.getCategory(command.getCommandLine());
 
-        // Info Item
+        inventory.setItem(4, createRequesterHead());
+
         ItemStack info = new ItemStack(Material.BOOK);
         ItemMeta infoMeta = info.getItemMeta();
         if (infoMeta != null) {
@@ -62,25 +64,39 @@ public class CommandDetailMenu implements InventoryHolder {
         }
         inventory.setItem(13, info);
 
-        // Confirm Item
-        ItemStack confirm = new ItemStack(Material.LIME_WOOL);
-        ItemMeta confirmMeta = confirm.getItemMeta();
-        if (confirmMeta != null) {
-            confirmMeta.setDisplayName(languageManager.getMessage(viewer, "gui.items.approve-name"));
-            confirmMeta.setLore(Arrays.asList(languageManager.getMessage(viewer, "gui.items.approve-lore")));
-            confirm.setItemMeta(confirmMeta);
-        }
-        inventory.setItem(11, confirm);
+        inventory.setItem(11, createActionItem(Material.LIME_WOOL, "gui.items.approve-name", "gui.items.approve-lore"));
+        inventory.setItem(15, createActionItem(Material.RED_WOOL, "gui.items.reject-name", "gui.items.reject-lore"));
+    }
 
-        // Deny Item
-        ItemStack deny = new ItemStack(Material.RED_WOOL);
-        ItemMeta denyMeta = deny.getItemMeta();
-        if (denyMeta != null) {
-            denyMeta.setDisplayName(languageManager.getMessage(viewer, "gui.items.reject-name"));
-            denyMeta.setLore(Arrays.asList(languageManager.getMessage(viewer, "gui.items.reject-lore")));
-            deny.setItemMeta(denyMeta);
+    private ItemStack createRequesterHead() {
+        ItemStack head = new ItemStack(Material.PLAYER_HEAD);
+        SkullMeta skullMeta = (SkullMeta) head.getItemMeta();
+        if (skullMeta != null) {
+            String senderName = command.getSenderName();
+            skullMeta.setDisplayName(languageManager.getMessage(viewer, "gui.items.requester-name")
+                    .replace("%player%", senderName));
+            
+            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(command.getSenderId());
+            if (offlinePlayer != null) {
+                skullMeta.setOwningPlayer(offlinePlayer);
+            }
+            
+            String requesterLabel = languageManager.getMessage(viewer, "gui.items.requester-label");
+            skullMeta.setLore(Arrays.asList(requesterLabel, senderName));
+            head.setItemMeta(skullMeta);
         }
-        inventory.setItem(15, deny);
+        return head;
+    }
+
+    private ItemStack createActionItem(Material material, String nameKey, String loreKey) {
+        ItemStack item = new ItemStack(material);
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName(languageManager.getMessage(viewer, nameKey));
+            meta.setLore(Arrays.asList(languageManager.getMessage(viewer, loreKey)));
+            item.setItemMeta(meta);
+        }
+        return item;
     }
 
     public void open(Player player) {

@@ -2,6 +2,7 @@ package br.com.devplugins.staging;
 
 import br.com.devplugins.audit.AuditManager;
 import br.com.devplugins.notifications.NotificationManager;
+import br.com.devplugins.ranking.RankingManager;
 import br.com.devplugins.rules.RulesEngine;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -20,22 +21,31 @@ public class StagingManager {
     private final AuditManager auditManager;
     private final NotificationManager notificationManager;
     private final RulesEngine rulesEngine;
+    private final RankingManager rankingManager;
     private final List<StagedCommand> pendingCommands;
+    private final CommandHistoryManager historyManager;
 
     public StagingManager(JavaPlugin plugin,
             StagedCommandRepository repository,
             br.com.devplugins.lang.LanguageManager languageManager,
             AuditManager auditManager,
             NotificationManager notificationManager,
-            RulesEngine rulesEngine) {
+            RulesEngine rulesEngine,
+            RankingManager rankingManager) {
         this.plugin = plugin;
         this.repository = repository;
         this.languageManager = languageManager;
         this.auditManager = auditManager;
         this.notificationManager = notificationManager;
         this.rulesEngine = rulesEngine;
+        this.rankingManager = rankingManager;
         this.pendingCommands = new ArrayList<>();
+        this.historyManager = new CommandHistoryManager(plugin);
         loadCommands();
+    }
+
+    public CommandHistoryManager getHistoryManager() {
+        return historyManager;
     }
 
     public void stageCommand(CommandSender sender, String commandLine) {
@@ -75,35 +85,53 @@ public class StagingManager {
         notificationManager.notifyStaging(command);
     }
 
-    public void approveCommand(StagedCommand command) {
+    public void approveCommand(StagedCommand command, Player reviewer) {
         if (!pendingCommands.contains(command))
             return;
+
+        command.setStatus(StagedCommand.Status.APPROVED);
+        if (reviewer != null) {
+            command.setReviewerId(reviewer.getUniqueId());
+            command.setReviewerName(reviewer.getName());
+            rankingManager.addApproval(reviewer.getUniqueId(), reviewer.getName());
+        }
 
         executeCommand(command);
 
         pendingCommands.remove(command);
+        historyManager.addToHistory(command);
 
         // Async delete
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             repository.delete(command);
         });
 
-        auditManager.log("approve", "Reviewer", "Command approved: " + command.getCommandLine());
+        String reviewerName = reviewer != null ? reviewer.getName() : "System";
+        auditManager.log("approve", reviewerName, "Command approved: " + command.getCommandLine());
         notificationManager.notifyApproval(command);
     }
 
-    public void rejectCommand(StagedCommand command) {
+    public void rejectCommand(StagedCommand command, Player reviewer) {
         if (!pendingCommands.contains(command))
             return;
 
+        command.setStatus(StagedCommand.Status.REJECTED);
+        if (reviewer != null) {
+            command.setReviewerId(reviewer.getUniqueId());
+            command.setReviewerName(reviewer.getName());
+            rankingManager.addRejection(reviewer.getUniqueId(), reviewer.getName());
+        }
+
         pendingCommands.remove(command);
+        historyManager.addToHistory(command);
 
         // Async delete
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             repository.delete(command);
         });
 
-        auditManager.log("reject", "Reviewer", "Command rejected: " + command.getCommandLine());
+        String reviewerName = reviewer != null ? reviewer.getName() : "System";
+        auditManager.log("reject", reviewerName, "Command rejected: " + command.getCommandLine());
         notificationManager.notifyRejection(command);
     }
 

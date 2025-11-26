@@ -13,6 +13,15 @@ commands:
     usage: /review
     permission: devreview.admin
     permission-message: §cYou do not have permission to use this command.
+  mystatus:
+    description: Opens the status menu to view your command request history.
+    usage: /mystatus
+    permission-message: §cYou do not have permission to use this command.
+  devrank:
+    description: Shows the employee ranking.
+    usage: /devrank
+    permission: devreview.rank
+    permission-message: §cYou do not have permission to use this command.
 
 permissions:
   devreview.admin:
@@ -21,3 +30,6 @@ permissions:
   devreview.bypass:
     description: Allows bypassing the command staging system.
     default: false
+  devreview.rank:
+    description: Allows viewing the employee ranking.
+    default: true

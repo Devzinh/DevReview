@@ -8,6 +8,14 @@ public class StagedCommand {
     private final String senderName;
     private final String commandLine;
     private final long timestamp;
+    private String justification;
+    private UUID reviewerId;
+    private String reviewerName;
+    private Status status;
+
+    public enum Status {
+        PENDING, APPROVED, REJECTED
+    }
 
     public StagedCommand(UUID senderId, String senderName, String commandLine) {
         this.id = UUID.randomUUID();
@@ -15,6 +23,7 @@ public class StagedCommand {
         this.senderName = senderName;
         this.commandLine = commandLine;
         this.timestamp = System.currentTimeMillis();
+        this.status = Status.PENDING;
     }
 
     // Constructor for loading from persistence
@@ -26,6 +35,7 @@ public class StagedCommand {
         this.commandLine = commandLine;
         this.timestamp = timestamp;
         this.justification = justification;
+        this.status = Status.PENDING;
     }
 
     public UUID getId() {
@@ -48,13 +58,35 @@ public class StagedCommand {
         return timestamp;
     }
 
-    private String justification;
-
     public String getJustification() {
         return justification;
     }
 
     public void setJustification(String justification) {
         this.justification = justification;
+    }
+
+    public UUID getReviewerId() {
+        return reviewerId;
+    }
+
+    public void setReviewerId(UUID reviewerId) {
+        this.reviewerId = reviewerId;
+    }
+
+    public String getReviewerName() {
+        return reviewerName;
+    }
+
+    public void setReviewerName(String reviewerName) {
+        this.reviewerName = reviewerName;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 }

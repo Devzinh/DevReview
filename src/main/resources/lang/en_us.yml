@@ -4,6 +4,7 @@ messages:
   bypass-admin-notification: "&c[DevReview] %player% bypassed review for: %command%"
   staging-notification: "&c[Staging] &eNew command staged by %player%: &7%command%"
   only-players: "&cOnly players can use this command."
+  no-permission: "&cYou do not have permission to use this command."
   command-approved: "&aCommand approved."
   command-rejected: "&cCommand rejected."
   approval-notification: "&a[DevReview] Command from %player% approved: %command%"
@@ -14,6 +15,15 @@ messages:
 gui:
   review-title: "Pending Reviews"
   detail-title: "Review Command"
+  status-title: "My Command Status"
+  status:
+    approved: "APPROVED"
+    rejected: "REJECTED"
+    pending: "PENDING"
+    no-history: "&cNo Command History"
+    no-history-lore: "&7You haven't requested any commands yet."
+    reviewer-label: "&7Reviewed by: "
+    reason-label: "&7Reason:"
   items:
     click-to-review: "&aClick to review"
     approve-name: "&a&lAPPROVE"
@@ -27,3 +37,19 @@ gui:
     list-command: "&7Command: &f%command%"
     list-time: "&7Time: &f%time%"
     list-id: "&7ID: &8%id%"
+    requester-name: "&eRequester: &f%player%"
+    requester-name: "&eRequester: &f%player%"
+    requester-label: "&7Requested by:"
+  ranking:
+    header: "&6=== Employee Ranking ==="
+    no-data: "&eNo ranking data available yet."
+    approvals: "&f - Approvals: &a%count%"
+    rejections: "&f, Rejections: &c%count%"
+    rank-first: "&a&l[1st] "
+    rank-last: "&c[Last] "
+    rank-other: "&7[%rank%] "
+  gui:
+    ranking-title: "Employee Ranking"
+    ranking:
+      lore-approvals: "&fApprovals: &a%count%"
+      lore-rejections: "&fRejections: &c%count%"

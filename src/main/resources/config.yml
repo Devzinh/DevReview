@@ -9,3 +9,7 @@ critical-commands:
   - "/restart"
   - "/ban"
   - "/kick"
+
+ranking:
+  enabled: true
+  reset-period: "WEEKLY" # Options: WEEKLY, MONTHLY

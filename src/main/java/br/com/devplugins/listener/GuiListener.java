@@ -1,6 +1,8 @@
 package br.com.devplugins.listener;
 
 import br.com.devplugins.gui.CommandDetailMenu;
+import br.com.devplugins.gui.CommandStatusMenu;
+import br.com.devplugins.gui.RankingMenu;
 import br.com.devplugins.gui.ReviewMenu;
 import br.com.devplugins.staging.StagedCommand;
 import br.com.devplugins.staging.StagingManager;
@@ -47,6 +49,10 @@ public class GuiListener implements Listener {
         } else if (holder instanceof CommandDetailMenu) {
             event.setCancelled(true);
             handleDetailMenuClick(event, (CommandDetailMenu) holder);
+        } else if (holder instanceof CommandStatusMenu) {
+            event.setCancelled(true);
+        } else if (holder instanceof RankingMenu) {
+            event.setCancelled(true);
         }
     }
 
@@ -116,7 +122,7 @@ public class GuiListener implements Listener {
             player.sendMessage(languageManager.getMessage(player, "messages.enter-justification-approve"));
             awaitingJustification.put(player.getUniqueId(), (justification) -> {
                 command.setJustification(justification);
-                stagingManager.approveCommand(command);
+                stagingManager.approveCommand(command, player);
                 player.sendMessage(languageManager.getMessage(player, "messages.command-approved"));
                 new ReviewMenu(stagingManager, languageManager, player, categoryManager).open(player);
             });
@@ -126,7 +132,7 @@ public class GuiListener implements Listener {
             player.sendMessage(languageManager.getMessage(player, "messages.enter-justification-reject"));
             awaitingJustification.put(player.getUniqueId(), (justification) -> {
                 command.setJustification(justification);
-                stagingManager.rejectCommand(command);
+                stagingManager.rejectCommand(command, player);
                 player.sendMessage(languageManager.getMessage(player, "messages.command-rejected"));
                 new ReviewMenu(stagingManager, languageManager, player, categoryManager).open(player);
             });

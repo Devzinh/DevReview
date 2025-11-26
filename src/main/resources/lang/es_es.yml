@@ -14,6 +14,15 @@ messages:
 gui:
   review-title: "Revisiones Pendientes"
   detail-title: "Revisar Comando"
+  status-title: "Estado de Mis Comandos"
+  status:
+    approved: "APROBADO"
+    rejected: "RECHAZADO"
+    pending: "PENDIENTE"
+    no-history: "&cSin Historial de Comandos"
+    no-history-lore: "&7Aún no has solicitado ningún comando."
+    reviewer-label: "&7Revisado por: "
+    reason-label: "&7Razón:"
   items:
     click-to-review: "&aClic para revisar"
     approve-name: "&a&lAPROBAR"
@@ -27,3 +36,19 @@ gui:
     list-command: "&7Comando: &f%command%"
     list-time: "&7Hora: &f%time%"
     list-id: "&7ID: &8%id%"
+    requester-name: "&eSolicitante: &f%player%"
+    requester-name: "&eSolicitante: &f%player%"
+    requester-label: "&7Solicitado por:"
+  ranking:
+    header: "&6=== Ranking de Empleados ==="
+    no-data: "&eNo hay datos de ranking disponibles aún."
+    approvals: "&f - Aprobaciones: &a%count%"
+    rejections: "&f, Rechazos: &c%count%"
+    rank-first: "&a&l[1º] "
+    rank-last: "&c[Último] "
+    rank-other: "&7[%rank%] "
+  gui:
+    ranking-title: "Ranking de Empleados"
+    ranking:
+      lore-approvals: "&fAprobaciones: &a%count%"
+      lore-rejections: "&fRechazos: &c%count%"

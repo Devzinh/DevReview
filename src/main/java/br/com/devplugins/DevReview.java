@@ -4,6 +4,7 @@ import br.com.devplugins.audit.AuditManager;
 import br.com.devplugins.notifications.NotificationManager;
 import br.com.devplugins.rules.RulesEngine;
 import br.com.devplugins.scheduler.SchedulerManager;
+import br.com.devplugins.ranking.RankingManager;
 import br.com.devplugins.staging.*;
 import br.com.devplugins.utils.CategoryManager;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -19,6 +20,7 @@ public final class DevReview extends JavaPlugin {
     private NotificationManager notificationManager;
     private RulesEngine rulesEngine;
     private CategoryManager categoryManager;
+    private RankingManager rankingManager;
 
     private StagedCommandRepository repository;
 
@@ -31,9 +33,9 @@ public final class DevReview extends JavaPlugin {
 
         this.languageManager = new br.com.devplugins.lang.LanguageManager(this);
         this.auditManager = new AuditManager(this);
-        this.notificationManager = new NotificationManager(this, languageManager);
         this.rulesEngine = new RulesEngine(this);
         this.categoryManager = new CategoryManager(this);
+        this.rankingManager = new RankingManager(this);
 
         // Initialize Repository based on config
         File dbConfig = new File(getDataFolder(), "database.yml");
@@ -47,8 +49,12 @@ public final class DevReview extends JavaPlugin {
             this.repository = new JsonStagedCommandRepository(this);
         }
 
+        // Create notification manager first (staging manager will be set later)
+        this.notificationManager = new NotificationManager(this, languageManager, null, categoryManager);
         this.stagingManager = new StagingManager(this, repository, languageManager, auditManager, notificationManager,
-                rulesEngine);
+                rulesEngine, rankingManager);
+        // Update notification manager with staging manager reference
+        this.notificationManager.setStagingManager(stagingManager);
 
         new SchedulerManager(this, stagingManager);
 
@@ -76,6 +82,26 @@ public final class DevReview extends JavaPlugin {
                     .open((org.bukkit.entity.Player) sender);
             return true;
         });
+
+        getCommand("mystatus").setExecutor((sender, command, label, args) -> {
+            if (!(sender instanceof org.bukkit.entity.Player)) {
+                sender.sendMessage(languageManager.getMessage(sender, "messages.only-players"));
+                return true;
+            }
+            new br.com.devplugins.gui.CommandStatusMenu(stagingManager, languageManager,
+                    (org.bukkit.entity.Player) sender,
+                    categoryManager)
+                    .open((org.bukkit.entity.Player) sender);
+            return true;
+        });
+
+        getCommand("devrank")
+                .setExecutor(new br.com.devplugins.commands.RankingCommand(rankingManager, languageManager));
+
+        if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new br.com.devplugins.placeholders.RankingPlaceholderExpansion(this, rankingManager, languageManager)
+                    .register();
+        }
     }
 
     @Override

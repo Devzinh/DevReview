@@ -1,7 +1,10 @@
 package br.com.devplugins.notifications;
 
+import br.com.devplugins.gui.CommandStatusMenu;
 import br.com.devplugins.lang.LanguageManager;
 import br.com.devplugins.staging.StagedCommand;
+import br.com.devplugins.staging.StagingManager;
+import br.com.devplugins.utils.CategoryManager;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -18,12 +21,20 @@ public class NotificationManager {
 
     private final JavaPlugin plugin;
     private final LanguageManager languageManager;
+    private StagingManager stagingManager;
+    private final CategoryManager categoryManager;
     private YamlConfiguration config;
 
-    public NotificationManager(JavaPlugin plugin, LanguageManager languageManager) {
+    public NotificationManager(JavaPlugin plugin, LanguageManager languageManager, StagingManager stagingManager, CategoryManager categoryManager) {
         this.plugin = plugin;
         this.languageManager = languageManager;
+        this.stagingManager = stagingManager;
+        this.categoryManager = categoryManager;
         loadConfig();
+    }
+
+    public void setStagingManager(StagingManager stagingManager) {
+        this.stagingManager = stagingManager;
     }
 
     private void loadConfig() {
@@ -50,6 +61,14 @@ public class NotificationManager {
         Player sender = Bukkit.getPlayer(command.getSenderId());
         if (sender != null && sender.isOnline()) {
             sendNotificationToPlayer(sender, "approval", command);
+            // Open status menu after a short delay
+            if (stagingManager != null) {
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    if (sender.isOnline()) {
+                        new CommandStatusMenu(stagingManager, languageManager, sender, categoryManager).open(sender);
+                    }
+                }, 20L);
+            }
         }
     }
 
@@ -59,6 +78,14 @@ public class NotificationManager {
         Player sender = Bukkit.getPlayer(command.getSenderId());
         if (sender != null && sender.isOnline()) {
             sendNotificationToPlayer(sender, "rejection", command);
+            // Open status menu after a short delay
+            if (stagingManager != null) {
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    if (sender.isOnline()) {
+                        new CommandStatusMenu(stagingManager, languageManager, sender, categoryManager).open(sender);
+                    }
+                }, 20L);
+            }
         }
     }
 

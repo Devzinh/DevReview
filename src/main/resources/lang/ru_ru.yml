@@ -14,6 +14,15 @@ messages:
 gui:
   review-title: "Ожидающие проверки"
   detail-title: "Проверка команды"
+  status-title: "Статус моих команд"
+  status:
+    approved: "ОДОБРЕНО"
+    rejected: "ОТКЛОНЕНО"
+    pending: "ОЖИДАЕТ"
+    no-history: "&cНет истории команд"
+    no-history-lore: "&7Вы еще не запрашивали команды."
+    reviewer-label: "&7Проверено: "
+    reason-label: "&7Причина:"
   items:
     click-to-review: "&aНажмите для проверки"
     approve-name: "&a&lОДОБРИТЬ"
@@ -27,3 +36,19 @@ gui:
     list-command: "&7Команда: &f%command%"
     list-time: "&7Время: &f%time%"
     list-id: "&7ID: &8%id%"
+    requester-name: "&eЗапросивший: &f%player%"
+    requester-name: "&eЗапросил: &f%player%"
+    requester-label: "&7Запрошено:"
+  ranking:
+    header: "&6=== Рейтинг Сотрудников ==="
+    no-data: "&eДанные рейтинга пока недоступны."
+    approvals: "&f - Одобрений: &a%count%"
+    rejections: "&f, Отклонений: &c%count%"
+    rank-first: "&a&l[1-й] "
+    rank-last: "&c[Последний] "
+    rank-other: "&7[%rank%] "
+  gui:
+    ranking-title: "Рейтинг Сотрудников"
+    ranking:
+      lore-approvals: "&fОдобрений: &a%count%"
+      lore-rejections: "&fОтклонений: &c%count%"
